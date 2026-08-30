@@ -1608,7 +1608,7 @@ Do as you will.`);
     }
 
     getPi() {
-      return 3.1415926535897932;
+      return PI;
     }
     getPiI() {
       return "3.1415926535897932i";
@@ -1808,8 +1808,8 @@ Do as you will.`);
         const re = x.re,
           im = x.im;
         let r = this.strBuild(
-          0.5 * atg(2 * re, 1 - re ** 2 - im ** 2),
-          0.25 * ln(re ** 2 + (im + 1) ** 2) - 0.25 * ln(re ** 2 + (im - 1) ** 2)
+          0.5 * atg(1 - re ** 2 - im ** 2, 2 * re),
+          0.5 * lnHypot(re, im + 1) - 0.5 * lnHypot(re, im - 1)
         ); // indeed, magic
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
