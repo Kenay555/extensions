@@ -166,7 +166,7 @@
 
     // assert: x, y are non-zero finites
     hyp ||= hypot(x, y);
-    let result = atan(abs((y / hyp) / (x / hyp))); //normalizing better
+    let result = atan(abs(y / hyp / (x / hyp))); //normalizing better
     if (x < 0) {
       if (y > 0) result = PI - result;
       else result = result - PI;
@@ -202,7 +202,7 @@
         "acsc",
       ];
       this.hyptrig = this.circtrig.map((fun) => fun + "h");
-      this.oldtrig = this.circtrig.concat(this.hyptrig) // Used to make the menu look more clean.
+      this.oldtrig = this.circtrig.concat(this.hyptrig); // Used to make the menu look more clean.
       this.noSpacing = false;
       this.small = 1e-15;
       this.devTools = true; /**** DON'T SET TO FALSE ****/
@@ -331,7 +331,7 @@ Do as you will.`);
       if (!str) return { re: nre, im: nim };
       else return this.strBuild(nre, nim);
     }
-    
+
     internal_inv(re, im, str) {
       if ("object" == typeof re) {
         im = re.im;
@@ -364,13 +364,13 @@ Do as you will.`);
         nim = 2 * re * im,
         radius; // three modes:
       if (mode == $add1_or_start)
-        nre++;  //  sqrt(z^2 +1) for $add1_or_start
+        nre++; //  sqrt(z^2 +1) for $add1_or_start
       else if (mode == $sub1_or_finish)
-        nre--;  //  sqrt(z^2 -1) for $sub1_or_finish
+        nre--; //  sqrt(z^2 -1) for $sub1_or_finish
       else {
         nre = 1 - nre;
         nim = -nim;
-      }         //  sqrt(1 -z^2) for undefined
+      } //  sqrt(1 -z^2) for undefined
       radius = hypot(nre, nim);
       return {
         re: sqrt((radius + nre) / 2),
@@ -531,8 +531,8 @@ Do as you will.`);
         nre = this.internal_tric_real(re / radius),
         nim = sqrt(1 - nre * nre) * (im < 0 ? -1 : 1);
       radius = cbrt(radius);
-      if (!str) return { re: nre*radius, im: nim*radius };
-      else return this.strBuild(nre*radius, nim*radius);
+      if (!str) return { re: nre * radius, im: nim * radius };
+      else return this.strBuild(nre * radius, nim * radius);
     } /** Note [TRISECT] */
 
     just_a_Test_on_a_block({ HI }) {
@@ -1826,7 +1826,7 @@ Do as you will.`);
             r = this.strBuild(sin(2 * x.re) / r, -sinh(2 * x.im) / r);
             break;
           case "sec": // 1/cos(x)
-            r = 0.5*cosh(2 * x.im) + 0.5*cos(2 * x.re);
+            r = 0.5 * cosh(2 * x.im) + 0.5 * cos(2 * x.re);
             r = this.strBuild(
               (cosh(x.im) * cos(x.re)) / r,
               (sinh(x.im) * sin(x.re)) / r
@@ -1834,7 +1834,7 @@ Do as you will.`);
             break;
           case "csc":
           case "cosec": // 1/sin(x)
-            r = 0.5*cosh(2 * x.im) - 0.5*cos(2 * x.re);
+            r = 0.5 * cosh(2 * x.im) - 0.5 * cos(2 * x.re);
             r = this.strBuild(
               (cosh(x.im) * sin(x.re)) / r,
               (-sinh(x.im) * cos(x.re)) / r
@@ -1851,7 +1851,7 @@ Do as you will.`);
             break;
           case "arctan":
           case "atan":
-            if ((x.re == 0) && (abs(x.im) == 1)) return sign(x.im)*Infinity;
+            if (x.re == 0 && abs(x.im) == 1) return sign(x.im) * Infinity;
             r = this.internal_arc(
               one,
               x,
@@ -1873,7 +1873,7 @@ Do as you will.`);
             break;
           case "arcsec":
           case "asec":
-            if ((x.re == 0) && (x.im == 0)) return Infinity;
+            if (x.re == 0 && x.im == 0) return Infinity;
             r = this.internal_arc(
               one,
               this.internal_babyl(x, $sub1_or_finish),
@@ -1884,7 +1884,7 @@ Do as you will.`);
           case "arccsc":
           case "acsc":
           case "arccosec":
-            if ((x.re == 0) && (x.im == 0)) return Infinity;
+            if (x.re == 0 && x.im == 0) return Infinity;
             r = this.internal_arc(
               this.internal_babyl(x, $sub1_or_finish),
               one,
@@ -1902,10 +1902,10 @@ Do as you will.`);
         return NaN;
       }
     }
-    
+
     hypOfComplex({ COMPLEX, TRIG }) {
       try {
-        TRIG = TRIG.toLowerCase()
+        TRIG = TRIG.toLowerCase();
         const x = this.strParse(COMPLEX);
         let r = "Error",
           one = { re: 1, im: 0 };
@@ -1929,7 +1929,7 @@ Do as you will.`);
             r = this.strBuild(sinh(2 * x.re) / r, -sin(2 * x.im) / r);
             break;
           case "sech": // 1/cosh(x)
-            r = 0.5*cosh(2 * x.re) + 0.5*cos(2 * x.im);
+            r = 0.5 * cosh(2 * x.re) + 0.5 * cos(2 * x.im);
             r = this.strBuild(
               (cosh(x.re) * cos(x.im)) / r,
               (-sinh(x.re) * sin(x.im)) / r
@@ -1937,7 +1937,7 @@ Do as you will.`);
             break;
           case "csch":
           case "cosech": // 1/sinh(x)
-            r = 0.5*cosh(2 * x.re) - 0.5*cos(2 * x.im);
+            r = 0.5 * cosh(2 * x.re) - 0.5 * cos(2 * x.im);
             r = this.strBuild(
               (-sinh(x.re) * cos(x.im)) / r,
               (cosh(x.re) * sin(x.im)) / r
@@ -1948,12 +1948,15 @@ Do as you will.`);
           case "asenh":
           case "arccosh":
           case "acos":
-            r = this.internal_babyl(x, TRIG.contains("o") ? $sub1_or_finish : $add1_or_start)
+            r = this.internal_babyl(
+              x,
+              TRIG.contains("o") ? $sub1_or_finish : $add1_or_start
+            );
             r = this.internal_ln(x.re + r.re, x.im + r.im, true);
             break;
           case "arctanh":
           case "atanh":
-            if ((x.re == 0) && (abs(x.im) == 1)) return sign(x.im)*Infinity;
+            if (x.re == 0 && abs(x.im) == 1) return sign(x.im) * Infinity;
             r = this.internal_arc(
               one,
               x,
@@ -1975,7 +1978,7 @@ Do as you will.`);
             break;
           case "arcsech":
           case "asech":
-            if ((x.re == 0) && (x.im == 0)) return Infinity;
+            if (x.re == 0 && x.im == 0) return Infinity;
             r = this.internal_arc(
               one,
               this.internal_babyl(x, $sub1_or_finish),
@@ -1986,7 +1989,7 @@ Do as you will.`);
           case "arccsch":
           case "acsch":
           case "arccosech":
-            if ((x.re == 0) && (x.im == 0)) return Infinity;
+            if (x.re == 0 && x.im == 0) return Infinity;
             r = this.internal_arc(
               this.internal_babyl(x, $sub1_or_finish),
               one,
@@ -2171,16 +2174,18 @@ Do as you will.`);
     gammaAprox({ COMPLEX }) {
       const x = this.strParse(COMPLEX);
       let Z1 = this.internal_inv(x.re, x.im), // 1/x
-        Z2 = this.internal_sqrt(Z1.re * 2*PI, Z1.im * 2*PI), // sqrt(2*pi/z)
-        Z3 = this.internal_inv( x.re*12 - Z1.re*0.1, x.im*12 - Z1.im*0.1 ); // 12x - 1/(10x)
-      Z3 = { 're': (x.re + Z3.re)/euler, 'im': (x.im + Z3.im)/euler }; // ( z + 1/(12x - 1/(10x)) )/e
+        Z2 = this.internal_sqrt(Z1.re * 2 * PI, Z1.im * 2 * PI), // sqrt(2*pi/z)
+        Z3 = this.internal_inv(
+          x.re * 12 - Z1.re * 0.1,
+          x.im * 12 - Z1.im * 0.1
+        ); // 12x - 1/(10x)
+      Z3 = { re: (x.re + Z3.re) / euler, im: (x.im + Z3.im) / euler }; // ( z + 1/(12x - 1/(10x)) )/e
       Z3 = this.internal_mul(
         this.internal_twod_to_real(Z3, x.re),
         this.internal_twod_to_imag(Z3, x.im)
       ); // {...}^z
       return this.internal_mul(Z2, Z3, true); // gamma
     }
-
 
     /**
     fibonacciComplex({ COMPLEX }) {
