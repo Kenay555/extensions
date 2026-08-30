@@ -66,8 +66,8 @@
   }
 
   const $timer = Symbol("it's just a pretend timer, what did you expect?"),
-    $start_or_add1 = Symbol("let me try to advance now"),
-    $finish_or_sub1 = Symbol("it's the END!!!!!! or something"),
+    $add1_or_start = Symbol("let me try to advance now"),
+    $sub1_or_finish = Symbol("it's the END!!!!!! or something"),
     $duration = Symbol("time, nonetheless? more like onethemore!");
 
   /**   Helper JS functions   **/
@@ -78,11 +78,9 @@
     sin = Math.sin,
     cos = Math.cos,
     exp = Math.exp,
+    euler = exp(1),
     atan = Math.atan,
     PI = Math.PI || 3.141592653589793,
-    PIo2 = PI >> 1,
-    PIo4 = PI >> 2,
-    PI3o4 = PIo2 + PIo4,
     floor = Math.floor,
     ceil = Math.ceil; /*, $em1 = Math.expm1;
   const expm1 = 
@@ -154,9 +152,9 @@
     if (isNaN(x) || isNaN(y)) return NaN;
     if (abs(y) == Infinity) {
       const sy = sign(y);
-      if (x == +Infinity) return sy * PIo4;
-      if (x == -Infinity) return sy * PI3o4;
-      return sy * PIo2;
+      if (x == +Infinity) return sy * PI * 0.25;
+      if (x == -Infinity) return sy * PI * 0.75;
+      return sy * PI * 0.5;
     }
     if (y == 0) {
       if (x < 0) return sign(1 / y) * PI;
@@ -164,11 +162,11 @@
     }
     if (x == Infinity) return +0 * y;
     if (x == -Infinity) return sign(y) * PI;
-    if (x == 0) return sign(y) * PIo2;
+    if (x == 0) return sign(y) * PI * 0.5;
 
     // assert: x, y are non-zero finites
     hyp ||= hypot(x, y);
-    let result = atan(abs(y / hyp / (x / hyp))); //normalizing better
+    let result = atan(abs((y / hyp) / (x / hyp))); //normalizing better
     if (x < 0) {
       if (y > 0) result = PI - result;
       else result = result - PI;
@@ -232,7 +230,7 @@
       ]; // Used to make the menu look more clean.
       this.noSpacing = false;
       this.small = 1e-15;
-      this.devTools = true; /**** DON'T SET TO FALSE ****/
+      this.devTools = false; /**** DON'T SET TO FALSE ****/
       this.advanced = this.devtools && true;
       try {
         console.log(window);
@@ -358,6 +356,18 @@ Do as you will.`);
       if (!str) return { re: nre, im: nim };
       else return this.strBuild(nre, nim);
     }
+    
+    internal_inv(re, im, str) {
+      if ("object" == typeof re) {
+        im = re.im;
+        re = re.re;
+      }
+      let radius = re * re + im * im;
+      let nre = re / radius,
+        nim = -im / radius;
+      if (!str) return { re: nre, im: nim };
+      else return this.strBuild(nre, nim);
+    }
 
     internal_sqrt(re, im, str) {
       if ("object" == typeof re) {
@@ -378,10 +388,10 @@ Do as you will.`);
         nre = re * re + im * im,
         nim = 2 * re * im,
         radius; // three modes:
-      if (mode == $start_or_add1)
-        nre++; //  > sqrt(z^2 +1) for $start_or_add1
-      else if (mode == $finish_or_sub1)
-        nre--; //  > sqrt(z^2 -1) for $finish_or_sub1
+      if (mode == $add1_or_start)
+        nre++; //  > sqrt(z^2 +1) for $add1_or_start
+      else if (mode == $sub1_or_finish)
+        nre--; //  > sqrt(z^2 -1) for $sub1_or_finish
       else {
         nre = 1 - nre;
         nim = -nim;
@@ -403,14 +413,13 @@ Do as you will.`);
       else return this.strBuild(ret);
     }
 
-    internal_exp(re, im, str) {
-      // compatibility things
+    /*internal_exp(re, im, str) {
       if ("object" == typeof re) {
         im = re.im;
         re = re.re;
       }
       return this.internal_polar(exp(re), im, str);
-    }
+    } //*/
 
     internal_ln(re, im, str) {
       if ("object" == typeof re) {
@@ -544,14 +553,12 @@ Do as you will.`);
         im = re.im;
         re = re.re;
       }
-      let radius = hypot(re, im);
-      let nre = this.internal_tric_real(re / radius),
+      let radius = hypot(re, im),
+        nre = this.internal_tric_real(re / radius),
         nim = sqrt(1 - nre * nre) * (im < 0 ? -1 : 1);
       radius = cbrt(radius);
-      nre *= radius;
-      nim *= radius;
-      if (!str) return { re: nre, im: nim };
-      else return this.strBuild(nre, nim);
+      if (!str) return { re: nre*radius, im: nim*radius };
+      else return this.strBuild(nre*radius, nim*radius);
     } /** Note [TRISECT] */
 
     just_a_Test_on_a_block({ HI }) {
@@ -561,7 +568,7 @@ Do as you will.`);
     getInfo() {
       return {
         id: "kenayComplexity",
-        name: Scratch.translate("Complexity! v1.7"),
+        name: Scratch.translate("Complexity! v1.75"),
         docsURI:
           "https://sites.google.com/view/complexity/complexity/complexity-js/",
         color1: "#77549f",
@@ -1237,7 +1244,6 @@ Do as you will.`);
                 defaultValue: "3+4i",
               },
             },
-            hideFromPalette: this.devTools,
           },
           {
             opcode: "facOf",
@@ -1602,7 +1608,7 @@ Do as you will.`);
     }
 
     getPi() {
-      return "3.1415926535897932";
+      return 3.1415926535897932;
     }
     getPiI() {
       return "3.1415926535897932i";
@@ -1652,7 +1658,7 @@ Do as you will.`);
 
     expComplex({ COMPLEX }) {
       const p = this.strParse(COMPLEX);
-      let r = this.internal_polar(exp(p.re), p.im);
+      let r = this.internal_polar(exp(p.re), p.im, true);
       if (this.noSpacing) r = r.replace(/\s+/g, "");
       return r;
     }
@@ -1733,8 +1739,8 @@ Do as you will.`);
         if (timeElapsed < sf[$duration] * 1000) {
           // We've moving! And we'll move again.
           const frac = timeElapsed / (util.stackFrame[$duration] * 1000),
-            start = sf[$start_or_add1],
-            finish = sf[$finish_or_sub1];
+            start = sf[$add1_or_start],
+            finish = sf[$sub1_or_finish];
           util.target.setXY(
             start.re + (finish.re - start.re) * frac,
             start.im + (finish.im - start.im) * frac
@@ -1743,8 +1749,8 @@ Do as you will.`);
         } else {
           // We're done! Now, lets end this
           util.target.setXY(
-            util.stackFrame[$finish_or_sub1].re,
-            util.stackFrame[$finish_or_sub1].im
+            util.stackFrame[$sub1_or_finish].re,
+            util.stackFrame[$sub1_or_finish].im
           );
         }
       } else {
@@ -1754,18 +1760,18 @@ Do as you will.`);
         util.stackFrame[$timer] = new Timer();
         util.stackFrame[$timer].start();
         if (args.SECS > 0) {
-          util.stackFrame[$start_or_add1] = {
+          util.stackFrame[$add1_or_start] = {
             re: util.target.x,
             im: util.target.y,
           };
-          util.stackFrame[$finish_or_sub1] = goal;
+          util.stackFrame[$sub1_or_finish] = goal;
         } else {
           args.SECS = -args.SECS;
-          util.stackFrame[$finish_or_sub1] = {
+          util.stackFrame[$sub1_or_finish] = {
             re: util.target.x,
             im: util.target.y,
           };
-          util.stackFrame[$start_or_add1] = goal;
+          util.stackFrame[$add1_or_start] = goal;
         }
         util.stackFrame[$duration] = args.SECS;
         util.yield();
@@ -1803,7 +1809,7 @@ Do as you will.`);
           im = x.im;
         let r = this.strBuild(
           0.5 * atg(2 * re, 1 - re ** 2 - im ** 2),
-          0.25 * (ln(re ** 2 + (im + 1) ** 2) - ln(re ** 2 + (im - 1) ** 2))
+          0.25 * ln(re ** 2 + (im + 1) ** 2) - 0.25 * ln(re ** 2 + (im - 1) ** 2)
         ); // indeed, magic
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
@@ -1825,7 +1831,6 @@ Do as you will.`);
       try {
         const x = this.strParse(COMPLEX);
         let r = "Error",
-          h,
           one = { re: 1, im: 0 };
         switch (TRIG.toLowerCase()) {
           case "sin":
@@ -1837,28 +1842,28 @@ Do as you will.`);
             break;
           case "tg":
           case "tan": // i(exp(-ix) - exp(ix))/(exp(-ix) + exp(ix))
-            h = cosh(2 * x.im) + cos(2 * x.re);
-            r = this.strBuild(sin(2 * x.re) / h, sinh(2 * x.im) / h);
+            r = cosh(2 * x.im) + cos(2 * x.re);
+            r = this.strBuild(sin(2 * x.re) / r, sinh(2 * x.im) / r);
             break;
           case "ctg":
           case "cot":
           case "cotan": // i(exp(-ix) + exp(ix))/(exp(-ix) - exp(ix))
-            h = cosh(2 * x.im) - cos(2 * x.re);
-            r = this.strBuild(sin(2 * x.re) / h, -sinh(2 * x.im) / h);
+            r = cosh(2 * x.im) - cos(2 * x.re);
+            r = this.strBuild(sin(2 * x.re) / r, -sinh(2 * x.im) / r);
             break;
           case "sec": // 1/cos(x)
-            h = cosh(2 * x.im) + cos(2 * x.re);
+            r = 0.5*cosh(2 * x.im) + 0.5*cos(2 * x.re);
             r = this.strBuild(
-              (2 * cosh(x.im) * cos(x.re)) / h,
-              (2 * sinh(x.im) * sin(x.re)) / h
+              (cosh(x.im) * cos(x.re)) / r,
+              (sinh(x.im) * sin(x.re)) / r
             );
             break;
           case "csc":
           case "cosec": // 1/sin(x)
-            h = cosh(2 * x.im) - cos(2 * x.re);
+            r = 0.5*cosh(2 * x.im) - 0.5*cos(2 * x.re);
             r = this.strBuild(
-              (2 * cosh(x.im) * sin(x.re)) / h,
-              (-2 * sinh(x.im) * cos(x.re)) / h
+              (cosh(x.im) * sin(x.re)) / r,
+              (-sinh(x.im) * cos(x.re)) / r
             );
             break;
           case "arcsin":
@@ -1872,10 +1877,11 @@ Do as you will.`);
             break;
           case "arctan":
           case "atan":
+            if ((x.re == 0) && (abs(x.im) == 1)) return sign(x.im)*Infinity;
             r = this.internal_arc(
               one,
               x,
-              this.internal_babyl(x, $start_or_add1),
+              this.internal_babyl(x, $add1_or_start),
               true
             ); // (1-xi)/sqrt(x^2 +1)
             break;
@@ -1883,18 +1889,20 @@ Do as you will.`);
           case "actg":
           case "acot":
           case "arccotan":
+            if (x.im == 0) return atg(1, x.re);
             r = this.internal_arc(
               x,
               one,
-              this.internal_babyl(x, $start_or_add1),
+              this.internal_babyl(x, $add1_or_start),
               true
             );
             break;
           case "arcsec":
           case "asec":
+            if ((x.re == 0) && (x.im == 0)) return Infinity;
             r = this.internal_arc(
               one,
-              this.internal_babyl(x, $finish_or_sub1),
+              this.internal_babyl(x, $sub1_or_finish),
               x,
               true
             ); // (1 -isqrt(x^2 -1))/x
@@ -1902,8 +1910,111 @@ Do as you will.`);
           case "arccsc":
           case "acsc":
           case "arccosec":
+            if ((x.re == 0) && (x.im == 0)) return Infinity;
             r = this.internal_arc(
-              this.internal_babyl(x, $finish_or_sub1),
+              this.internal_babyl(x, $sub1_or_finish),
+              one,
+              x,
+              true
+            ); // Note [ARCSEC]
+            break;
+          default:
+            return "NaN";
+        }
+        if (this.noSpacing) r = r.replace(/\s+/g, "");
+        return r;
+      } catch (e) {
+        console.log(e);
+        return NaN;
+      }
+    }
+    
+    hypOfComplex({ COMPLEX, TRIG }) {
+      try {
+        TRIG = TRIG.toLowerCase()
+        const x = this.strParse(COMPLEX);
+        let r = "Error",
+          one = { re: 1, im: 0 };
+        switch (TRIG) {
+          case "sinh":
+          case "senh": // (exp(x) - exp(-x))/2
+            r = this.strBuild(sinh(x.re) * cos(x.im), cosh(x.re) * sin(x.im));
+            break;
+          case "cosh": // (exp(x) + exp(-x))/2
+            r = this.strBuild(cosh(x.re) * cos(x.im), sinh(x.re) * sin(x.im));
+            break;
+          case "tgh":
+          case "tanh": // (exp(-x) - exp(x))/(exp(-x) + exp(x))
+            r = cosh(2 * x.re) + cos(2 * x.im);
+            r = this.strBuild(sinh(2 * x.re) / r, sin(2 * x.im) / r);
+            break;
+          case "ctgh":
+          case "coth":
+          case "cotanh": // (exp(-x) + exp(x))/(exp(-x) - exp(x))
+            r = cosh(2 * x.tr) - cos(2 * x.im);
+            r = this.strBuild(sinh(2 * x.re) / r, -sin(2 * x.im) / r);
+            break;
+          case "sech": // 1/cosh(x)
+            r = 0.5*cosh(2 * x.re) + 0.5*cos(2 * x.im);
+            r = this.strBuild(
+              (cosh(x.re) * cos(x.im)) / r,
+              (-sinh(x.re) * sin(x.im)) / r
+            );
+            break;
+          case "csch":
+          case "cosech": // 1/sinh(x)
+            r = 0.5*cosh(2 * x.re) - 0.5*cos(2 * x.im);
+            r = this.strBuild(
+              (-sinh(x.re) * cos(x.im)) / r,
+              (cosh(x.re) * sin(x.im)) / r
+            );
+            break;
+          case "arcsinh":
+          case "asinh":
+          case "asenh":
+          case "arccosh":
+          case "acos":
+            r = this.internal_babyl(x, TRIG.contains("o") ? $sub1_or_finish : $add1_or_start)
+            r = this.internal_ln(x.re + r.re, x.im + r.im, true);
+            break;
+          case "arctanh":
+          case "atanh":
+            if ((x.re == 0) && (abs(x.im) == 1)) return sign(x.im)*Infinity;
+            r = this.internal_arc(
+              one,
+              x,
+              this.internal_babyl(x, $add1_or_start),
+              true
+            ); // (1-xi)/sqrt(x^2 +1)
+            break;
+          case "arccoth":
+          case "actgh":
+          case "acoth":
+          case "arccotanh":
+            if (x.im == 0) return atg(1, x.re);
+            r = this.internal_arc(
+              x,
+              one,
+              this.internal_babyl(x, $add1_or_start),
+              true
+            );
+            break;
+          case "arcsech":
+          case "asech":
+            if ((x.re == 0) && (x.im == 0)) return Infinity;
+            r = this.internal_arc(
+              one,
+              this.internal_babyl(x, $sub1_or_finish),
+              x,
+              true
+            ); // (1 -isqrt(x^2 -1))/x
+            break;
+          case "arccsch":
+          case "acsch":
+          case "arccosech":
+            if ((x.re == 0) && (x.im == 0)) return Infinity;
+            r = this.internal_arc(
+              this.internal_babyl(x, $sub1_or_finish),
               one,
               x,
               true
@@ -2055,7 +2166,7 @@ Do as you will.`);
         ANGLE = this.strParse(ANGLE);
         let n = this.internal_mul(
           { re: VECTOR.re - POINT.re, im: VECTOR.im - POINT.im },
-          this.internal_exp(-ANGLE.im, ANGLE.re)
+          this.internal_polar(exp(-ANGLE.im), ANGLE.re)
         );
         let r = this.strBuild(n.re + POINT.re, n.im + POINT.im);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -2083,6 +2194,20 @@ Do as you will.`);
       return "1.618033988749895";
     }
 
+    gammaAprox({ COMPLEX }) {
+      const x = this.strParse(COMPLEX);
+      let Z1 = this.internal_inv(x.re, x.im), // 1/x
+        Z2 = this.internal_sqrt(Z1.re * 2*PI, Z1.im * 2*PI), // sqrt(2*pi/z)
+        Z3 = this.internal_inv( 're': x.re*12 - Z1.re*0.1, 'im': x.im*12 - Z1.im*0.1 ); // 12x - 1/(10x)
+      Z3 = { 're': (x.re + Z3.re)/euler, 'im': (x.im + Z3.im)/euler }; // ( z + 1/(12x - 1/(10x)) )/e
+      Z3 = this.internal_mul(
+        this.internal_twod_to_real(Z3, x.re),
+        this.internal_twod_to_imag(Z3, x.im)
+      ); // {...}^z
+      return this.internal_mul(Z2, Z3, true); // gamma
+    }
+
+
     /**
     fibonacciComplex({ COMPLEX }) {
       let r = Complex.GOLDEN.pow(COMPLEX)
@@ -2096,12 +2221,6 @@ Do as you will.`);
         The following is the v3 of the Factorial function. 
         The day it's fast, efficient and right, it'll see the light of day.
 
-    gammaAprox({ COMPLEX }) {
-      //Used in the extension
-      let r = gamma(COMPLEX).toString();
-      if (this.noSpacing) r = r.replace(/\s+/g, '');
-      return r;
-    }
 
     facOf({ COMPLEX }) {
       try {
@@ -2197,7 +2316,7 @@ Thanks [@Clickertale2] for being always there, always helping.
       > [internal_babyl] is a wrapped internal_sqrt for a simple reason...
         it makes writing code one picosecond easier.
         of course, one could replace it with this.internal_sqrt({ 're': x.re*x.re + x.im*x.im -1, 'im': 2*x.re*x.im})
-        or anything like that, but I personally prefer this.internal_babyl(x, $finish_or_sub1).
+        or anything like that, but I personally prefer this.internal_babyl(x, $sub1_or_finish).
         on why "babyl", Babylonials already knew Pythagoras's Thoerem.
       > [internal_arc] is a somewhat funny story, but long story short, I felt atg wouldn't be of much help.
         atg is merely for real values, internal_arc works as a general atan2 for complex numbers,
