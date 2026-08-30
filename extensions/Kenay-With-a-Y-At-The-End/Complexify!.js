@@ -13,7 +13,7 @@
  * 1) I encourage you to tell me all the things i made wrong.
  *    Better live in a hell of truths than a heaven of lies.
  * 2) This extension is not finished. Not yet.
- *    If you think anything would  make this be better, tell me.
+ *    If you think anything would make this be better, tell me.
  * 3) Not sure if you noticed I'm a silly programmer, have you seen these comments?
  *    I think the extension would lose its spirit (and documentation) without them.
  * 4) There are commentary NOTES which require a lot of explaining
@@ -202,36 +202,11 @@
         "acsc",
       ];
       this.hyptrig = this.circtrig.map((fun) => fun + "h");
-      this.oldtrig = [
-        "sin",
-        "cos",
-        "tan",
-        "cot",
-        "sec",
-        "csc",
-        "asin",
-        "acos",
-        "atan",
-        "acot",
-        "asec",
-        "acsc",
-        "sinh",
-        "cosh",
-        "tanh",
-        "coth",
-        "sech",
-        "csch",
-        "asinh",
-        "acosh",
-        "atanh",
-        "acoth",
-        "asech",
-        "acsch",
-      ]; // Used to make the menu look more clean.
+      this.oldtrig = this.circtrig.concat(this.hyptrig) // Used to make the menu look more clean.
       this.noSpacing = false;
       this.small = 1e-15;
       this.devTools = true; /**** DON'T SET TO FALSE ****/
-      this.advanced = this.devtools && true;
+      this.advanced = this.devtools;
       try {
         console.log(window);
         console.log("Complexified Successfully! Hooray!");
@@ -385,17 +360,17 @@ Do as you will.`);
       // specialized sqrt routine
       let re = x.re,
         im = x.im,
-        nre = re * re + im * im,
+        nre = re * re - im * im,
         nim = 2 * re * im,
         radius; // three modes:
       if (mode == $add1_or_start)
-        nre++; //  > sqrt(z^2 +1) for $add1_or_start
+        nre++;  //  sqrt(z^2 +1) for $add1_or_start
       else if (mode == $sub1_or_finish)
-        nre--; //  > sqrt(z^2 -1) for $sub1_or_finish
+        nre--;  //  sqrt(z^2 -1) for $sub1_or_finish
       else {
         nre = 1 - nre;
         nim = -nim;
-      } //  > sqrt(1 -z^2) for undefined
+      }         //  sqrt(1 -z^2) for undefined
       radius = hypot(nre, nim);
       return {
         re: sqrt((radius + nre) / 2),
@@ -434,7 +409,7 @@ Do as you will.`);
 
     internal_arc(cos, sin, hyp = undefined, str) {
       if (hyp == undefined) {
-        const sqre = cos.re ** 2 - cos.im ** 2 + sin.re ** 2 - sin.im ** 2,
+        let sqre = cos.re ** 2 - cos.im ** 2 + sin.re ** 2 - sin.im ** 2,
           sqim = 2 * cos.re * cos.im + 2 * sin.re * sin.im;
         hyp = this.internal_sqrt(sqre, sqim);
       }
@@ -449,7 +424,6 @@ Do as you will.`);
     } /** Note [INTERNAL] */
 
     internal_twod_to_real(base, n, str) {
-      // raise a complex base to a real n, given that base.im != 0
       if (n == 0) return { re: 1, im: 0 };
       if (n == 1) return base;
       if (base.im == 0) {
@@ -568,7 +542,7 @@ Do as you will.`);
     getInfo() {
       return {
         id: "kenayComplexity",
-        name: Scratch.translate("Complexity! v1.75"),
+        name: Scratch.translate("Complexity! v1.78"),
         docsURI:
           "https://sites.google.com/view/complexity/complexity/complexity-js/",
         color1: "#77549f",
