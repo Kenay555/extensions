@@ -230,7 +230,7 @@
       ]; // Used to make the menu look more clean.
       this.noSpacing = false;
       this.small = 1e-15;
-      this.devTools = false; /**** DON'T SET TO FALSE ****/
+      this.devTools = true; /**** DON'T SET TO FALSE ****/
       this.advanced = this.devtools && true;
       try {
         console.log(window);
@@ -2198,7 +2198,7 @@ Do as you will.`);
       const x = this.strParse(COMPLEX);
       let Z1 = this.internal_inv(x.re, x.im), // 1/x
         Z2 = this.internal_sqrt(Z1.re * 2*PI, Z1.im * 2*PI), // sqrt(2*pi/z)
-        Z3 = this.internal_inv( 're': x.re*12 - Z1.re*0.1, 'im': x.im*12 - Z1.im*0.1 ); // 12x - 1/(10x)
+        Z3 = this.internal_inv( x.re*12 - Z1.re*0.1, x.im*12 - Z1.im*0.1 ); // 12x - 1/(10x)
       Z3 = { 're': (x.re + Z3.re)/euler, 'im': (x.im + Z3.im)/euler }; // ( z + 1/(12x - 1/(10x)) )/e
       Z3 = this.internal_mul(
         this.internal_twod_to_real(Z3, x.re),
