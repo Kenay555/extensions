@@ -23,9 +23,9 @@
  */
 
 (function (Scratch) {
+  "use strict";
   const devTools = false, /**** DON'T SET TO false ****/
     _useless = false;
-  "use strict";
   if (!Scratch.extensions.unsandboxed) {
     throw new Error("Complexity! must run unsandboxed"); // For the `util`s
   }
@@ -1943,8 +1943,7 @@ Do as you will.`);
       try {
         TRIG = TRIG.toLowerCase();
         let x = this.strParse(COMPLEX),
-          r = "Error",
-          one = { re: 1, im: 0 };
+          r = "Error";
         switch (TRIG) {
           case "sinh":
           case "senh": // (exp(x) - exp(-x))/2
@@ -2167,7 +2166,6 @@ Do as you will.`);
 
     toggleAdvancedBlocks() {
       this.advanced = !this.advanced;
-      devTools = true;
       Scratch.vm.extensionManager.refreshBlocks();
     }
 
