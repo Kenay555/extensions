@@ -24,8 +24,8 @@
 
 (function (Scratch) {
   "use strict";
-  const devTools = false /**** DON'T SET TO false ****/,
-    _useless = false;
+  const devTools = false, /**** DON'T SET TO false ****/
+    _useless = true;
   if (!Scratch.extensions.unsandboxed) {
     throw new Error("Complexity! must run unsandboxed"); // For the `util`s
   }
@@ -158,7 +158,7 @@
 
     // assert: x, y are non-zero finites
     hyp ||= hypot(x, y);
-    let result = atan(abs(y / hyp / (x / hyp))); //normalizing better
+    let result = atan(abs((y / hyp) / (x / hyp))); //normalizing better
     if (x < 0) {
       if (y > 0) result = PI - result;
       else result = result - PI;
@@ -194,7 +194,7 @@
         "acsc",
       ];
       this.hyptrigs = this.circtrigs.map((fun) => fun + "h");
-      this.fulltrigs = this.circtrigs.concat(this.hyptrigs); // Used to make the menu look more clean.
+      this.fulltrigs = this.circtrigs.concat(this.hyptrigs) // Used to make the menu look more clean.
       this.noSpacing = false;
       this.small = 1e-15;
       this.advanced = devTools;
@@ -325,7 +325,7 @@ Do as you will.`);
       if (!str) return { re: nre, im: nim };
       else return this.strBuild(nre, nim);
     }
-
+    
     internal_inv(re, im, str) {
       if ("object" == typeof re) {
         im = re.im;
@@ -358,13 +358,13 @@ Do as you will.`);
         nim = 2 * re * im,
         radius; // three modes:
       if (mode == $add1_or_start)
-        nre++; //  sqrt(z^2 +1) for $add1_or_start
+        nre++;  //  sqrt(z^2 +1) for $add1_or_start
       else if (mode == $sub1_or_finish)
-        nre--; //  sqrt(z^2 -1) for $sub1_or_finish
+        nre--;  //  sqrt(z^2 -1) for $sub1_or_finish
       else {
         nre = 1 - nre;
         nim = -nim;
-      } //  sqrt(1 -z^2) for undefined
+      }         //  sqrt(1 -z^2) for undefined
       radius = hypot(nre, nim);
       return {
         re: sqrt((radius + nre) / 2),
@@ -465,7 +465,7 @@ Do as you will.`);
       }
       if (!str) return ret;
       else return this.strBuild(ret);
-    }
+    } 
 
     internal_twod_to_imag(base, n) {
       if (n == 0) return { re: 1, im: 0 };
@@ -477,7 +477,7 @@ Do as you will.`);
         exp(-n * atg(base.re, base.im)),
         (lnHypot(base.re, base.im) * n) % (2 * PI)
       );
-    }
+    } 
 
     internal_tric_real(c) {
       let guess = (c + 8) / 9,
@@ -488,7 +488,7 @@ Do as you will.`);
         guess -= kre;
       }
       return guess;
-    }
+    } 
 
     internal_tric_complex(cre, cim, str) {
       if ("object" == typeof cre) {
@@ -514,7 +514,7 @@ Do as you will.`);
       }
       if (!str) return { re: a, im: b };
       else return this.strBuild(a, b); // NOTE: Very expensive calcs, use sparingly
-    }
+    } 
 
     internal_cbrt(re, im, str) {
       if ("object" == typeof re) {
@@ -525,9 +525,9 @@ Do as you will.`);
         nre = this.internal_tric_real(re / radius),
         nim = sqrt(1 - nre * nre) * (im < 0 ? -1 : 1);
       radius = cbrt(radius);
-      if (!str) return { re: nre * radius, im: nim * radius };
-      else return this.strBuild(nre * radius, nim * radius);
-    }
+      if (!str) return { re: nre*radius, im: nim*radius };
+      else return this.strBuild(nre*radius, nim*radius);
+    } 
 
     just_a_Test_on_a_block({ HI }) {
       return this.internal_babyl(this.strParse(HI), "Error", true);
@@ -536,7 +536,7 @@ Do as you will.`);
     getInfo() {
       return {
         id: "kenayComplexity",
-        name: Scratch.translate("Complexity! v1.78"),
+        name: Scratch.translate("Complexity! v1.78555555555"),
         docsURI:
           "https://sites.google.com/view/complexity/complexity/complexity-js/",
         color1: "#77549f",
@@ -1547,7 +1547,7 @@ Do as you will.`);
         console.log(e);
         return NaN;
       }
-    }
+    } 
 
     // The Polar Tools
 
@@ -1833,9 +1833,7 @@ Do as you will.`);
     }
 
     trigOfComplex(args) {
-      if (this.circtrigs.includes(args.TRIG.toLowerCase()))
-        return this.circTrigOfComplex(args);
-      else return this.hypTrigOfComplex(args);
+      if (this.circtrigs.includes(args.TRIG.toLowerCase())) return this.circTrigOfComplex(args); else return this.hypTrigOfComplex(args);
     }
 
     circTrigOfComplex({ COMPLEX, TRIG }) {
@@ -1864,7 +1862,7 @@ Do as you will.`);
             r = this.strBuild(sin(2 * x.re) / r, -sinh(2 * x.im) / r);
             break;
           case "sec": // 1/cos(x)
-            r = 0.5 * cosh(2 * x.im) + 0.5 * cos(2 * x.re);
+            r = 0.5*cosh(2 * x.im) + 0.5*cos(2 * x.re);
             r = this.strBuild(
               (cosh(x.im) * cos(x.re)) / r,
               (sinh(x.im) * sin(x.re)) / r
@@ -1872,7 +1870,7 @@ Do as you will.`);
             break;
           case "csc":
           case "cosec": // 1/sin(x)
-            r = 0.5 * cosh(2 * x.im) - 0.5 * cos(2 * x.re);
+            r = 0.5*cosh(2 * x.im) - 0.5*cos(2 * x.re);
             r = this.strBuild(
               (cosh(x.im) * sin(x.re)) / r,
               (-sinh(x.im) * cos(x.re)) / r
@@ -1889,7 +1887,7 @@ Do as you will.`);
             break;
           case "arctan":
           case "atan":
-            if (x.re == 0 && abs(x.im) == 1) return sign(x.im) * Infinity;
+            if ((x.re == 0) && (abs(x.im) == 1)) return sign(x.im)*Infinity;
             r = this.internal_arc(
               one,
               x,
@@ -1911,7 +1909,7 @@ Do as you will.`);
             break;
           case "arcsec":
           case "asec":
-            if (x.re == 0 && x.im == 0) return Infinity;
+            if ((x.re == 0) && (x.im == 0)) return Infinity;
             r = this.internal_arc(
               one,
               this.internal_babyl(x, $sub1_or_finish),
@@ -1922,13 +1920,13 @@ Do as you will.`);
           case "arccsc":
           case "acsc":
           case "arccosec":
-            if (x.re == 0 && x.im == 0) return Infinity;
+            if ((x.re == 0) && (x.im == 0)) return Infinity;
             r = this.internal_arc(
               this.internal_babyl(x, $sub1_or_finish),
               one,
               x,
               true
-            );
+            ); 
             break;
           default:
             return "NaN";
@@ -1940,7 +1938,7 @@ Do as you will.`);
         return NaN;
       }
     }
-
+    
     hypTrigOfComplex({ COMPLEX, TRIG }) {
       try {
         TRIG = TRIG.toLowerCase();
@@ -1966,7 +1964,7 @@ Do as you will.`);
             r = this.strBuild(sinh(2 * x.re) / r, -sin(2 * x.im) / r);
             break;
           case "sech": // 1/cosh(x)
-            r = 0.5 * cosh(2 * x.re) + 0.5 * cos(2 * x.im);
+            r = 0.5*cosh(2 * x.re) + 0.5*cos(2 * x.im);
             r = this.strBuild(
               (cosh(x.re) * cos(x.im)) / r,
               (-sinh(x.re) * sin(x.im)) / r
@@ -1974,7 +1972,7 @@ Do as you will.`);
             break;
           case "csch":
           case "cosech": // 1/sinh(x)
-            r = 0.5 * cosh(2 * x.re) - 0.5 * cos(2 * x.im);
+            r = 0.5*cosh(2 * x.re) - 0.5*cos(2 * x.im);
             r = this.strBuild(
               (-sinh(x.re) * cos(x.im)) / r,
               (cosh(x.re) * sin(x.im)) / r
@@ -1983,40 +1981,34 @@ Do as you will.`);
           case "arsinh":
           case "asinh":
           case "asenh":
+            r = this.internal_babyl(x, $add1_or_start)
+            r = this.internal_ln(x.re + r.re, x.im + r.im, true);
+            break;
           case "arcosh":
           case "acosh":
-            r = this.internal_babyl(
-              x,
-              TRIG.contains("o") ? $sub1_or_finish : $add1_or_start
-            );
+            r = this.internal_babyl(x, $sub1_or_finish)
             r = this.internal_ln(x.re + r.re, x.im + r.im, true);
             break;
           case "artanh":
           case "atanh":
+            r = this.internal_ln(this.internal.sqrt(this.internal_div({ 're': x.re+1, 'im': x.im }, { 're': 1-x.re, 'im': -x.im })), true);
+            break;
           case "arcoth":
           case "acoth":
           case "arcotanh":
-            r = TRIG.contains("o")
-              ? { re: x.re - 1, im: x.im }
-              : { re: 1 - x.re, im: -x.im };
-            r = this.internal_ln(
-              this.internal.sqrt(
-                this.internal_div({ re: x.re + 1, im: x.im }, r)
-              ),
-              true
-            );
+            r = this.internal_ln(this.internal.sqrt(this.internal_div({ 're': x.re+1, 'im': x.im }, { 're': x.re-1, 'im': x.im })), true);
             break;
           case "arsech":
           case "asech":
-            x = this.internal_inv(x);
-            r = this.internal_babyl(x, $sub1_or_finish);
+            x = this.internal_inv(x)
+            r = this.internal_babyl(x, $sub1_or_finish)
             r = this.internal_ln(x.re + r.re, x.im + r.im, true);
             break;
           case "arcsch":
           case "acsch":
           case "arcosech":
-            x = this.internal_inv(x);
-            r = this.internal_babyl(x, $add1_or_start);
+            x = this.internal_inv(x)
+            r = this.internal_babyl(x, $add1_or_start)
             r = this.internal_ln(x.re + r.re, x.im + r.im, true);
             break;
           default:
@@ -2195,18 +2187,16 @@ Do as you will.`);
     gammaAprox({ COMPLEX }) {
       const x = this.strParse(COMPLEX);
       let Z1 = this.internal_inv(x.re, x.im), // 1/x
-        Z2 = this.internal_sqrt(Z1.re * 2 * PI, Z1.im * 2 * PI), // sqrt(2*pi/z)
-        Z3 = this.internal_inv(
-          x.re * 12 - Z1.re * 0.1,
-          x.im * 12 - Z1.im * 0.1
-        ); // 12x - 1/(10x)
-      Z3 = { re: (x.re + Z3.re) / euler, im: (x.im + Z3.im) / euler }; // ( z + 1/(12x - 1/(10x)) )/e
+        Z2 = this.internal_sqrt(Z1.re * 2*PI, Z1.im * 2*PI), // sqrt(2*pi/z)
+        Z3 = this.internal_inv( x.re*12 - Z1.re*0.1, x.im*12 - Z1.im*0.1 ); // 12x - 1/(10x)
+      Z3 = { 're': (x.re + Z3.re)/euler, 'im': (x.im + Z3.im)/euler }; // ( z + 1/(12x - 1/(10x)) )/e
       Z3 = this.internal_mul(
         this.internal_twod_to_real(Z3, x.re),
         this.internal_twod_to_imag(Z3, x.im)
       ); // {...}^z
       return this.internal_mul(Z2, Z3, true); // gamma
     }
+
 
     /**
     fibonacciComplex({ COMPLEX }) {
