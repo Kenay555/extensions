@@ -24,7 +24,7 @@
 
 (function (Scratch) {
   "use strict";
-  const devTools = false /**** DON'T SET TO false ****/,
+  const devTools = true /**** DON'T SET TO false ****/,
     _useless = true;
   if (!Scratch.extensions.unsandboxed) {
     throw new Error("Complexity! must run unsandboxed"); // For the `util`s
@@ -45,7 +45,6 @@
     }
     static get nowObj() {
       if (
-        Timer.USE_PERFORMANCE &&
         typeof self !== "undefined" &&
         self.performance &&
         "now" in self.performance
@@ -113,6 +112,11 @@
     // Falistate's failstate
     throw SyntaxError(anything);
   }
+  const sr5 = sqrt(5), // For the fibonacci calculator
+    fp = 0.5 + 0.5*sr5, 
+    fn = 0.5 - 0.5*sr5, 
+    ep = ln(fp), 
+    en = ln(-fn); // yeah, phi.
   const hypot = function (x, y) {
     x = abs(x);
     y = abs(y);
@@ -176,50 +180,7 @@
     "rads to degs": 57.29577951308232,
     hacker: 0,
   };
-
-  class ComplexityExtension {
-    constructor() {
-      this.circtrigs = [
-        "sin",
-        "cos",
-        "tan",
-        "ctg",
-        "sec",
-        "csc",
-        "asin",
-        "acos",
-        "atan",
-        "actg",
-        "asec",
-        "acsc",
-      ];
-      this.hyptrigs = this.circtrigs.map((fun) => fun + "h");
-      this.fulltrigs = this.circtrigs.concat(this.hyptrigs); // Used to make the menu look more clean.
-      this.noSpacing = false;
-      this.small = 1e-15;
-      this.advanced = devTools;
-      try {
-        console.log(window);
-        console.log("Complexified Successfully! Hooray!");
-      } catch (e) {
-        console.log("Complexity had a complex error!");
-        console.log(e);
-      }
-      if (!this) {
-        console.error(
-          "`this` isn't bounded enough for the complex constructor"
-        );
-      } else {
-        console.log(this);
-      }
-      if (!devTools) {
-        alert(`You are in Complexity's developer mode.
-Half of the special things break...
-Do as you will.`);
-      }
-    }
-
-    strParse = function (str) {
+  const strParse = function strParse(str) {
       if ("string" != typeof str) return { re: str, im: 0 };
       str = str.toLowerCase().replace(/_/g, "");
       if (str.includes("infinity")) return { re: Infinity, im: Infinity };
@@ -269,8 +230,9 @@ Do as you will.`);
           `There's a lonely '${neg % 2 ? "-" : "+"}' ending sign: "${str}"`
         );
       return parsed;
-    };
-    strBuild(a, b) {
+  };
+  var pretty_small = 1e-15;
+  const strBuild = function strBuild(a, b) {
       if ("object" === typeof a) {
         b = a.im;
         a = a.re;
@@ -281,10 +243,10 @@ Do as you will.`);
       if (!(isFinite(a) && isFinite(b))) {
         return "Infinity";
       }
-      if (abs(a) < this.small) {
+      if (abs(a) < pretty_small) {
         a = 0;
       }
-      if (abs(b) < this.small) {
+      if (abs(b) < pretty_small) {
         b = 0;
       }
       let ret = "";
@@ -309,21 +271,66 @@ Do as you will.`);
         ret += b;
       }
       return ret + "i";
+  };
+  const multiply = function multiply(a, b, c, d, str) {
+    if (d == undefined) { 
+      str = c;
+      c = a.re;
+      d = a.im;
+      a = b.re;
+      b = b.im;
     }
+    let nre = a * c - b * d,
+        nim = a * d + b * c;
+    return str ? strBuild(nre, nim) : { re: nre, im: nim };
+  };
 
-    internal_mul(p1, p2, str) {
-      let nre = p1.re * p2.re - p1.im * p2.im,
-        nim = p1.re * p2.im + p1.im * p2.re;
-      if (!str) return { re: nre, im: nim };
-      else return this.strBuild(nre, nim);
+  class ComplexityExtension {
+    constructor() {
+      this.circtrigs = [
+        "sin",
+        "cos",
+        "tan",
+        "ctg",
+        "sec",
+        "csc",
+        "asin",
+        "acos",
+        "atan",
+        "actg",
+        "asec",
+        "acsc",
+      ];
+      this.hyptrigs = this.circtrigs.map((fun) => fun + "h");
+      this.fulltrigs = this.circtrigs.concat(this.hyptrigs); // Used to make the menu look more clean.
+      this.noSpacing = false;
+      this.advanced = devTools;
+      try {
+        console.log(window);
+        console.log("Complexified Successfully! Hooray!");
+      } catch (e) {
+        console.log("Complexity had a complex error!");
+        console.log(e);
+      }
+      if (!this) {
+        console.error(
+          "`this` isn't bounded enough for the complex constructor"
+        );
+      } else {
+        console.log(this);
+      }
+      if (!devTools) {
+        alert(`You are in Complexity's developer mode.
+Half of the special things break...
+Do as you will.`);
+      }
     }
 
     internal_div(p1, p2, str) {
       let radius = p2.re * p2.re + p2.im * p2.im;
       let nre = (p1.re * p2.re + p1.im * p2.im) / radius,
         nim = (p1.im * p2.re - p1.re * p2.im) / radius;
-      if (!str) return { re: nre, im: nim };
-      else return this.strBuild(nre, nim);
+      return str ? strBuild(nre, nim) : { re: nre, im: nim };
     }
 
     internal_inv(re, im, str) {
@@ -334,8 +341,7 @@ Do as you will.`);
       let radius = re * re + im * im;
       let nre = re / radius,
         nim = -im / radius;
-      if (!str) return { re: nre, im: nim };
-      else return this.strBuild(nre, nim);
+      return str ? strBuild(nre, nim) : { re: nre, im: nim };
     }
 
     internal_sqrt(re, im, str) {
@@ -346,8 +352,7 @@ Do as you will.`);
       let radius = hypot(re, im);
       let nre = sqrt((radius + re) / 2),
         nim = sqrt((radius - re) / 2) * sign(im);
-      if (!str) return { re: nre, im: nim };
-      else return this.strBuild(nre, nim);
+      return str ? strBuild(nre, nim) : { re: nre, im: nim };
     }
 
     internal_babyl(x, mode) {
@@ -370,7 +375,7 @@ Do as you will.`);
         re: sqrt((radius + nre) / 2),
         im: sqrt((radius - nre) / 2) * sign(nim),
       };
-    } /** Note [INTERNAL] */
+    } 
 
     internal_polar(re, im, str) {
       if ("object" == typeof re) {
@@ -378,8 +383,7 @@ Do as you will.`);
         re = re.re;
       }
       let ret = { re: re * cos(im), im: re * sin(im) };
-      if (!str) return ret;
-      else return this.strBuild(ret);
+      return str ? strBuild(ret) : ret;
     }
 
     /*internal_exp(re, im, str) {
@@ -397,24 +401,23 @@ Do as you will.`);
       }
       let nre = lnHypot(re, im),
         nim = atg(re, im);
-      if (!str) return { re: nre, im: nim };
-      else return this.strBuild(nre, nim);
+      return str ? strBuild(nre, nim) : { re: nre, im: nim };
     }
 
     internal_arc(cos, sin, hyp = undefined, str) {
-      if (hyp == undefined) {
+      if (!hyp) {
         let sqre = cos.re ** 2 - cos.im ** 2 + sin.re ** 2 - sin.im ** 2,
           sqim = 2 * cos.re * cos.im + 2 * sin.re * sin.im;
         hyp = this.internal_sqrt(sqre, sqim);
       }
-      const num = this.internal_ln({
-          re: cos.re + sin.im,
-          im: cos.im - sin.re,
-        }),
-        den = this.internal_ln(hyp),
+      const num = this.internal_ln(
+          cos.re + sin.im,
+          cos.im - sin.re,
+          false // objects
+        ),
+        den = this.internal_ln(hyp.re, hyp.im, false),
         iln = { re: den.im - num.im, im: num.re - den.re };
-      if (!str) return iln;
-      else return this.strBuild(iln);
+      return str ? strBuild(iln) : iln;
     }
 
     internal_twod_to_real(base, n, str) {
@@ -446,10 +449,10 @@ Do as you will.`);
         if (n % rem != n % (rem << 1)) {
           // if a bit is found in the power-of-two
           n -= rem;
-          ret = this.internal_mul(ret, pow);
+          ret = multiply(ret, pow, false);
         }
         rem <<= 1;
-        pow = this.internal_mul(pow, pow);
+        pow = multiply(pow, pow, false);
       }
       pow = base;
       rem = 1;
@@ -458,13 +461,12 @@ Do as you will.`);
         if (n > rem) {
           // if this power-of-two fits in the exponent
           n -= rem;
-          ret = this.internal_mul(ret, pow);
+          ret = multiply(ret, pow, false);
         }
         rem >>= 1;
         pow = this.internal_sqrt(pow);
       }
-      if (!str) return ret;
-      else return this.strBuild(ret);
+      return str ? strBuild(ret) : ret;
     }
 
     internal_twod_to_imag(base, n) {
@@ -512,8 +514,7 @@ Do as you will.`);
         a -= kre;
         b -= kim;
       }
-      if (!str) return { re: a, im: b };
-      else return this.strBuild(a, b); // NOTE: Very expensive calcs, use sparingly
+      return str ? strBuild(a, b) : { re: a, im: b}; // NOTE: Very expensive calcs, use sparingly
     }
 
     internal_cbrt(re, im, str) {
@@ -525,37 +526,19 @@ Do as you will.`);
         nre = this.internal_tric_real(re / radius),
         nim = sqrt(1 - nre * nre) * (im < 0 ? -1 : 1);
       radius = cbrt(radius);
-      if (!str) return { re: nre * radius, im: nim * radius };
-      else return this.strBuild(nre * radius, nim * radius);
+      let ret = { re: nre * radius, im: nim * radius };
+      return str ? strBuild(ret) : ret;
     }
-
-    just_a_Test_on_a_block({ HI }) {
-      return this.internal_babyl(this.strParse(HI), "Error", true);
-    }
-
+    
     getInfo() {
       return {
         id: "kenayComplexity",
-        name: Scratch.translate("Complexity! v1.78555555555"),
+        name: Scratch.translate("Complexity! v1.8"),
         docsURI:
           "https://sites.google.com/view/complexity/complexity/complexity-js/",
         color1: "#77549f",
         menuIconURI,
         blocks: [
-          {
-            blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate("The protagonist"),
-            hideFromPalette: devTools,
-          },
-          {
-            opcode: "just_a_Test_on_a_block",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("sqrt(1- [HI]^2)"),
-            arguments: {
-              HI: { type: Scratch.ArgumentType.NUMBER, defaultValue: "i" },
-            },
-            hideFromPalette: devTools,
-          },
           {
             blockType: Scratch.BlockType.LABEL,
             text: Scratch.translate("The protagonist"),
@@ -716,6 +699,21 @@ Do as you will.`);
               COMPLEX2: {
                 type: Scratch.ArgumentType.STRING,
                 defaultValue: "3",
+              },
+            },
+          },
+          {
+            opcode: "scaleComplex",
+            blockType: Scratch.BlockType.REPORTER,
+            text: Scratch.translate("scale [COMPLEX] by [FACTOR]"),
+            arguments: {
+              COMPLEX: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "3+4i",
+              },
+              FACTOR: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 0.5,
               },
             },
           },
@@ -1083,6 +1081,22 @@ Do as you will.`);
             },
             hideFromPalette: this.advanced,
           },
+          {
+            opcode: "atg2Complex",
+            blockType: Scratch.BlockType.REPORTER,
+            text: Scratch.translate("Atg with X=[COMPLEX1], Y=[COMPLEX2]"),
+            arguments: {
+              COMPLEX1: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "3",
+              },
+              COMPLEX2: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "4",
+              },
+            },
+            hideFromPalette: this.advanced,
+          },
           "---",
           {
             blockType: Scratch.BlockType.LABEL,
@@ -1106,14 +1120,14 @@ Do as you will.`);
           },
           "---",
           {
-            text: Scratch.translate("The Strings"), //For others extensions to use
             blockType: Scratch.BlockType.LABEL,
+            text: Scratch.translate("The Analytic Functions"),
             hideFromPalette: this.advanced,
           },
           {
-            opcode: "complexArray",
+            opcode: "fibonacciComplex",
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("[COMPLEX] to array"),
+            text: Scratch.translate("Fibonacci of index [COMPLEX]"),
             arguments: {
               COMPLEX: {
                 type: Scratch.ArgumentType.STRING,
@@ -1123,9 +1137,21 @@ Do as you will.`);
             hideFromPalette: this.advanced,
           },
           {
-            opcode: "complexJSON",
+            opcode: "gammaAprox",
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("[COMPLEX] to JSON"),
+            text: Scratch.translate("aproximated Γ [COMPLEX]"),
+            arguments: {
+              COMPLEX: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "3+4i",
+              },
+            },
+            hideFromPalette: this.advanced,
+          },
+          {
+            opcode: "lambertAprox",
+            blockType: Scratch.BlockType.REPORTER,
+            text: Scratch.translate("Lambert's W of [COMPLEX]"),
             arguments: {
               COMPLEX: {
                 type: Scratch.ArgumentType.STRING,
@@ -1160,6 +1186,22 @@ Do as you will.`);
             },
           },
           {
+            opcode: "complexArray",
+            blockType: Scratch.BlockType.REPORTER,
+            text: Scratch.translate("export [COMPLEX] as [FORM]"),
+            arguments: {
+              COMPLEX: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "3+4i",
+              },
+              FORM: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "exporting"
+              },
+            },
+            hideFromPalette: this.advanced,
+          },
+          {
             opcode: "rootNo3",
             blockType: Scratch.BlockType.REPORTER,
             text: Scratch.translate("ω"),
@@ -1171,18 +1213,6 @@ Do as you will.`);
             text: Scratch.translate("φ"),
           },
           "---",
-          {
-            opcode: "fibonacciComplex",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("Fibonacci [COMPLEX]"),
-            arguments: {
-              COMPLEX: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: "3+4i",
-              },
-            },
-            hideFromPalette: devTools,
-          },
           {
             opcode: "mulVectorAroundPoint",
             blockType: Scratch.BlockType.REPORTER,
@@ -1225,51 +1255,20 @@ Do as you will.`);
           {
             opcode: "smallEnough",
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("Pretty small"),
+            text: Scratch.translate("pretty small"),
+          },
+          {
+            opcode: "smallChange",
+            blockType: Scratch.BlockType.COMMAND,
+            text: Scratch.translate("[Sw] is pretty small"),
+            arguments: {
+              Sw: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 1e-15,
+              },
+            },
           },
           "---",
-          {
-            opcode: "gammaAprox",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("aprox. Γ [COMPLEX]"),
-            arguments: {
-              COMPLEX: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: "3+4i",
-              },
-            },
-            hideFromPalette: this.advanced,
-          },
-          {
-            opcode: "facOf",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("aprox. [COMPLEX]!"),
-            arguments: {
-              COMPLEX: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: "3+4i",
-              },
-            },
-            hideFromPalette: _useless,
-          },
-          {
-            opcode: "Tfac",
-            blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("factorial terms"),
-            hideFromPalette: _useless,
-          },
-          {
-            opcode: "setTfac",
-            blockType: Scratch.BlockType.COMMAND,
-            text: Scratch.translate("set [COMPLEX] factorial terms"),
-            arguments: {
-              COMPLEX: {
-                type: Scratch.ArgumentType.NUMBER,
-                defaultValue: 2000,
-              },
-            },
-            hideFromPalette: _useless,
-          },
           {
             opcode: "empty",
             blockType: Scratch.BlockType.COMMAND,
@@ -1319,6 +1318,18 @@ Do as you will.`);
             },
             hideFromPalette: devTools,
           },
+          {
+            opcode: "_test_i_wanna_die_but_cant",
+            blockType: Scratch.BlockType.REPORTER,
+            text: Scratch.translate("testing W [COMPLEX]"),
+            arguments: {
+              COMPLEX: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "3+4i",
+              },
+            },
+            hideFromPalette: devTools,
+          },
         ],
         menus: {
           spacing: {
@@ -1332,24 +1343,29 @@ Do as you will.`);
             items: this.fulltrigs,
           },
           circtrigs: {
-            //For trigOfComplex
+            //For circTrigOfComplex
             acceptReporters: true,
             items: this.circtrigs,
           },
           hyptrigs: {
-            //For trigOfComplex
+            //For hypTrigOfComplex
             acceptReporters: true,
             items: this.hyptrigs,
           },
           angles: {
             //For convertComplex
-            acceptReporters: true,
+            acceptReporters: false,
             items: converter._all,
           },
           decTools: {
             //For decimalComplex
             acceptReporters: true,
             items: ["round", "ceil of", "floor of", "truncate"],
+          },
+          exporting: {
+            //For complexArray
+            acceptReporters: false,
+            items: ["array", "JSON", "compleX"],
           },
         },
       };
@@ -1368,7 +1384,7 @@ Do as you will.`);
       REAL = Scratch.Cast.toNumber(REAL);
       IMAG = Scratch.Cast.toNumber(IMAG);
       try {
-        let r = this.strBuild(REAL, IMAG);
+        let r = strBuild(REAL, IMAG);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1381,9 +1397,9 @@ Do as you will.`);
 
     rectComplex({ REAL, IMAG }) {
       try {
-        const p1 = this.strParse(REAL),
-          p2 = this.strParse(IMAG);
-        let r = this.strBuild(p1.re - p2.im, p2.re + p1.im);
+        const p1 = strParse(REAL),
+          p2 = strParse(IMAG);
+        let r = strBuild(p1.re - p2.im, p2.re + p1.im);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1394,7 +1410,7 @@ Do as you will.`);
 
     reComplex({ COMPLEX }) {
       try {
-        return this.strParse(COMPLEX).re;
+        return strParse(COMPLEX).re;
       } catch (e) {
         console.log(e);
         return NaN;
@@ -1403,7 +1419,7 @@ Do as you will.`);
 
     imComplex({ COMPLEX }) {
       try {
-        return this.strParse(COMPLEX).im;
+        return strParse(COMPLEX).im;
       } catch (e) {
         console.log(e);
         return NaN;
@@ -1412,8 +1428,8 @@ Do as you will.`);
 
     conjugateComplex({ COMPLEX }) {
       try {
-        const p = this.strParse(COMPLEX);
-        let r = this.strBuild(p.re, -p.im);
+        const p = strParse(COMPLEX);
+        let r = strBuild(p.re, -p.im);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1426,9 +1442,9 @@ Do as you will.`);
 
     addComplex({ COMPLEX1, COMPLEX2 }) {
       try {
-        const p1 = this.strParse(COMPLEX1),
-          p2 = this.strParse(COMPLEX2);
-        let r = this.strBuild(p1.re + p2.re, p1.im + p2.im);
+        const p1 = strParse(COMPLEX1),
+          p2 = strParse(COMPLEX2);
+        let r = strBuild(p1.re + p2.re, p1.im + p2.im);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1439,9 +1455,9 @@ Do as you will.`);
 
     subtractComplex({ COMPLEX1, COMPLEX2 }) {
       try {
-        const p1 = this.strParse(COMPLEX1),
-          p2 = this.strParse(COMPLEX2);
-        let r = this.strBuild(p1.re - p2.re, p1.im - p2.im);
+        const p1 = strParse(COMPLEX1),
+          p2 = strParse(COMPLEX2);
+        let r = strBuild(p1.re - p2.re, p1.im - p2.im);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1452,9 +1468,9 @@ Do as you will.`);
 
     multiplyComplex({ COMPLEX1, COMPLEX2 }) {
       try {
-        let r = this.internal_mul(
-          this.strParse(COMPLEX1),
-          this.strParse(COMPLEX2),
+        let r = multiply(
+          strParse(COMPLEX1),
+          strParse(COMPLEX2),
           true
         );
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -1468,8 +1484,8 @@ Do as you will.`);
     divideComplex({ COMPLEX1, COMPLEX2 }) {
       try {
         let r = this.internal_div(
-          this.strParse(COMPLEX1),
-          this.strParse(COMPLEX2),
+          strParse(COMPLEX1),
+          strParse(COMPLEX2),
           true
         );
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -1483,12 +1499,12 @@ Do as you will.`);
      */
     moduloComplex({ COMPLEX1, COMPLEX2 }) {
       try {
-        const p1 = this.strParse(COMPLEX1),
-          p2 = this.strParse(COMPLEX2);
+        const p1 = strParse(COMPLEX1),
+          p2 = strParse(COMPLEX2);
         let calc = this.internal_div(p1, p2);
         (calc.re = floor(calc.re)), (calc.im = floor(calc.im));
-        calc = this.internal_mul(p1, calc);
-        let r = this.strBuild(p1.re - calc.re, p1.im - calc.im);
+        calc = multiply(p1, calc);
+        let r = strBuild(p1.re - calc.re, p1.im - calc.im);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1499,13 +1515,13 @@ Do as you will.`);
 
     powComplex({ COMPLEX1, COMPLEX2 }) {
       try {
-        const p1 = this.strParse(COMPLEX1),
-          p2 = this.strParse(COMPLEX2);
-        let r = this.internal_mul(
+        const p1 = strParse(COMPLEX1),
+          p2 = strParse(COMPLEX2);
+        let r = multiply(
           this.internal_twod_to_real(p1, p2.re),
           this.internal_twod_to_imag(p1, p2.im)
         );
-        r = this.strBuild(r);
+        r = strBuild(r);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1516,8 +1532,8 @@ Do as you will.`);
 
     powComplex_OLD_POLARIZED({ COMPLEX1, COMPLEX2 }) {
       try {
-        const p1 = this.strParse(COMPLEX1),
-          p2 = this.strParse(COMPLEX2);
+        const p1 = strParse(COMPLEX1),
+          p2 = strParse(COMPLEX2);
         if (COMPLEX1 == 0) {
           if (p2.re > 0) return "0";
           if (COMPLEX2 == 0) return NaN;
@@ -1540,7 +1556,20 @@ Do as you will.`);
           loh = lnHypot(p1.re, p1.im),
           nre = exp(p2.re * loh - p2.im * polar),
           nim = p2.re * polar + p2.im * loh;
-        let r = this.strBuild(nre * cos(nim), nre * sin(nim));
+        let r = strBuild(nre * cos(nim), nre * sin(nim));
+        if (this.noSpacing) r = r.replace(/\s+/g, "");
+        return r;
+      } catch (e) {
+        console.log(e);
+        return NaN;
+      }
+    }
+
+    scaleComplex({ COMPLEX, FACTOR }) {
+      try {
+        const p = strParse(COMPLEX),
+          fac = Number(FACTOR);
+        let r = strBuild(p.re*fac, p.im*fac);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1553,12 +1582,12 @@ Do as you will.`);
 
     polarComplex({ RADIUS, ANGLE }) {
       try {
-        const p2 = this.strParse(ANGLE);
-        let r = this.internal_mul(
-          this.strParse(RADIUS),
+        const p2 = strParse(ANGLE);
+        let r = multiply(
+          strParse(RADIUS),
           this.internal_polar(exp(-p2.im), p2.re)
         );
-        r = this.strBuild(r);
+        r = strBuild(r);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1569,7 +1598,7 @@ Do as you will.`);
 
     absComplex({ COMPLEX }) {
       try {
-        const p = this.strParse(COMPLEX);
+        const p = strParse(COMPLEX);
         return hypot(p.re, p.im);
       } catch (e) {
         console.log(e);
@@ -1579,9 +1608,9 @@ Do as you will.`);
 
     complexSign({ COMPLEX }) {
       try {
-        const p = this.strParse(COMPLEX),
+        const p = strParse(COMPLEX),
           radius = hypot(p.re, p.im);
-        let r = this.strBuild(p.re / radius, p.im / radius);
+        let r = strBuild(p.re / radius, p.im / radius);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1592,7 +1621,7 @@ Do as you will.`);
 
     cisThingie({ COMPLEX }) {
       try {
-        const p = this.strParse(COMPLEX);
+        const p = strParse(COMPLEX);
         let r = this.internal_polar(exp(-p.im), p.re, true);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
@@ -1604,7 +1633,7 @@ Do as you will.`);
 
     argComplex({ COMPLEX }) {
       try {
-        const p = this.strParse(COMPLEX);
+        const p = strParse(COMPLEX);
         return atg(p.re, p.im);
       } catch (e) {
         console.log(e);
@@ -1622,16 +1651,16 @@ Do as you will.`);
     // zexde
 
     negComplex({ COMPLEX }) {
-      const p = this.strParse(COMPLEX);
-      let r = this.strBuild(-p.re, -p.im);
+      const p = strParse(COMPLEX);
+      let r = strBuild(-p.re, -p.im);
       if (this.noSpacing) r = r.replace(/\s+/g, "");
       return r;
     }
 
     inverseComplex({ COMPLEX }) {
-      const p = this.strParse(COMPLEX),
+      const p = strParse(COMPLEX),
         radius = p.re * p.re + p.im * p.im;
-      let r = this.strBuild(p.re / radius, -p.im / radius);
+      let r = strBuild(p.re / radius, -p.im / radius);
       if (this.noSpacing) r = r.replace(/\s+/g, "");
       return r;
     }
@@ -1662,57 +1691,57 @@ Do as you will.`);
     }
 
     expComplex({ COMPLEX }) {
-      const p = this.strParse(COMPLEX);
+      const p = strParse(COMPLEX);
       let r = this.internal_polar(exp(p.re), p.im, true);
       if (this.noSpacing) r = r.replace(/\s+/g, "");
       return r;
     }
 
     sqrtComplex({ COMPLEX }) {
-      const p = this.strParse(COMPLEX);
+      const p = strParse(COMPLEX);
       let r = this.internal_sqrt(p.re, p.im, true);
       if (this.noSpacing) r = r.replace(/\s+/g, "");
       return r;
     }
 
     cbrtComplex({ COMPLEX }) {
-      const p = this.strParse(COMPLEX);
+      const p = strParse(COMPLEX);
       let r = this.internal_cbrt(p.re, p.im, true);
       if (this.noSpacing) r = r.replace(/\s+/g, "");
       return r;
     }
 
     lnComplex({ COMPLEX }) {
-      const p = this.strParse(COMPLEX);
+      const p = strParse(COMPLEX);
       let r = this.internal_ln(p.re, p.im, true);
       if (this.noSpacing) r = r.replace(/\s+/g, "");
       return r;
     }
 
     getPosition(_, util) {
-      let r = this.strBuild(util.target.x, util.target.y);
+      let r = strBuild(util.target.x, util.target.y);
       if (this.noSpacing) r = r.replace(/\s+/g, "");
       return r;
     }
 
     goToComplex(args, util) {
       if (util.target.isStage) return;
-      const p = this.strParse(args.COMPLEX);
+      const p = strParse(args.COMPLEX);
       util.target.setXY(p.re, p.im);
     }
 
     goAddComplex(args, util) {
       if (util.target.isStage) return;
       let target = util.target;
-      const p = this.strParse(args.COMPLEX);
+      const p = strParse(args.COMPLEX);
       target.setXY(p.re + target.x, p.im + target.y);
     }
 
     goToPolar(args, util) {
       if (util.target.isStage) return;
-      const p1 = this.strParse(args.COMPLEX1),
-        p2 = this.strParse(args.COMPLEX2),
-        p = this.internal_mul(
+      const p1 = strParse(args.COMPLEX1),
+        p2 = strParse(args.COMPLEX2),
+        p = multiply(
           p1,
           this.internal_polar(exp(-p2.im), p2.re, false),
           false
@@ -1722,7 +1751,7 @@ Do as you will.`);
 
     goMulComplex(args, util) {
       if (util.target.isStage) return;
-      const p1 = this.strParse(args.COMPLEX);
+      const p1 = strParse(args.COMPLEX);
       let target = util.target;
       target.setXY(
         p1.re * target.x - p1.im * target.y,
@@ -1759,7 +1788,7 @@ Do as you will.`);
           );
         }
       } else {
-        const goal = this.strParse(args.COMPLEX);
+        const goal = strParse(args.COMPLEX);
         if (!isFinite(goal.re) || !isFinite(goal.im)) return;
         // We're starting! So, new Timer!
         util.stackFrame[$timer] = new Timer();
@@ -1785,8 +1814,8 @@ Do as you will.`);
 
     sinComplex({ COMPLEX }) {
       try {
-        const x = this.strParse(COMPLEX);
-        let r = this.strBuild(cosh(x.im) * sin(x.re), sinh(x.im) * cos(x.re));
+        const x = strParse(COMPLEX);
+        let r = strBuild(cosh(x.im) * sin(x.re), sinh(x.im) * cos(x.re));
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1797,8 +1826,8 @@ Do as you will.`);
 
     cosComplex({ COMPLEX }) {
       try {
-        const x = this.strParse(COMPLEX);
-        let r = this.strBuild(cosh(x.im) * cos(x.re), -sinh(x.im) * sin(x.re));
+        const x = strParse(COMPLEX);
+        let r = strBuild(cosh(x.im) * cos(x.re), -sinh(x.im) * sin(x.re));
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1809,10 +1838,10 @@ Do as you will.`);
 
     atanComplex({ COMPLEX }) {
       try {
-        const x = this.strParse(COMPLEX);
+        const x = strParse(COMPLEX);
         const re = x.re,
           im = x.im;
-        let r = this.strBuild(
+        let r = strBuild(
           0.5 * atg(1 - re ** 2 - im ** 2, 2 * re),
           0.5 * lnHypot(re, im + 1) - 0.5 * lnHypot(re, im - 1)
         ); // indeed, magic
@@ -1825,9 +1854,15 @@ Do as you will.`);
     }
 
     trisectCosComplex({ COMPLEX }) {
-      const p = this.strParse(COMPLEX);
+      const p = strParse(COMPLEX);
       if (p.im == 0) return this.internal_tric_real(p.re);
       let r = this.internal_tric_complex(p.re, p.im, true);
+      if (this.noSpacing) r = r.replace(/\s+/g, "");
+      return r;
+    }
+
+    atg2Complex({ COMPLEX1, COMPLEX2 }) {
+      let r = strBuild(this.internal_arc(strParse(COMPLEX1), strParse(COMPLEX2)))
       if (this.noSpacing) r = r.replace(/\s+/g, "");
       return r;
     }
@@ -1841,31 +1876,31 @@ Do as you will.`);
     circTrigOfComplex({ COMPLEX, TRIG }) {
       try {
         TRIG = TRIG.toLowerCase();
-        const x = this.strParse(COMPLEX);
+        const x = strParse(COMPLEX);
         let r = "Error",
           one = { re: 1, im: 0 };
         switch (TRIG) {
           case "sin":
           case "sen": // -i(exp(ix) - exp(-ix))/2
-            r = this.strBuild(cosh(x.im) * sin(x.re), sinh(x.im) * cos(x.re));
+            r = strBuild(cosh(x.im) * sin(x.re), sinh(x.im) * cos(x.re));
             break;
           case "cos": // (exp(ix) + exp(-ix))/2
-            r = this.strBuild(cosh(x.im) * cos(x.re), -sinh(x.im) * sin(x.re));
+            r = strBuild(cosh(x.im) * cos(x.re), -sinh(x.im) * sin(x.re));
             break;
           case "tg":
           case "tan": // i(exp(-ix) - exp(ix))/(exp(-ix) + exp(ix))
             r = cosh(2 * x.im) + cos(2 * x.re);
-            r = this.strBuild(sin(2 * x.re) / r, sinh(2 * x.im) / r);
+            r = strBuild(sin(2 * x.re) / r, sinh(2 * x.im) / r);
             break;
           case "ctg":
           case "cot":
           case "cotan": // i(exp(-ix) + exp(ix))/(exp(-ix) - exp(ix))
             r = cosh(2 * x.im) - cos(2 * x.re);
-            r = this.strBuild(sin(2 * x.re) / r, -sinh(2 * x.im) / r);
+            r = strBuild(sin(2 * x.re) / r, -sinh(2 * x.im) / r);
             break;
           case "sec": // 1/cos(x)
             r = 0.5 * cosh(2 * x.im) + 0.5 * cos(2 * x.re);
-            r = this.strBuild(
+            r = strBuild(
               (cosh(x.im) * cos(x.re)) / r,
               (sinh(x.im) * sin(x.re)) / r
             );
@@ -1873,7 +1908,7 @@ Do as you will.`);
           case "csc":
           case "cosec": // 1/sin(x)
             r = 0.5 * cosh(2 * x.im) - 0.5 * cos(2 * x.re);
-            r = this.strBuild(
+            r = strBuild(
               (cosh(x.im) * sin(x.re)) / r,
               (-sinh(x.im) * cos(x.re)) / r
             );
@@ -1931,6 +1966,7 @@ Do as you will.`);
             );
             break;
           default:
+            console.log(`The '${TRIG}' trig function isn't in the circular library`)
             return "NaN";
         }
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -1944,30 +1980,30 @@ Do as you will.`);
     hypTrigOfComplex({ COMPLEX, TRIG }) {
       try {
         TRIG = TRIG.toLowerCase();
-        let x = this.strParse(COMPLEX),
+        let x = strParse(COMPLEX),
           r = "Error";
         switch (TRIG) {
           case "sinh":
           case "senh": // (exp(x) - exp(-x))/2
-            r = this.strBuild(sinh(x.re) * cos(x.im), cosh(x.re) * sin(x.im));
+            r = strBuild(sinh(x.re) * cos(x.im), cosh(x.re) * sin(x.im));
             break;
           case "cosh": // (exp(x) + exp(-x))/2
-            r = this.strBuild(cosh(x.re) * cos(x.im), sinh(x.re) * sin(x.im));
+            r = strBuild(cosh(x.re) * cos(x.im), sinh(x.re) * sin(x.im));
             break;
           case "tgh":
           case "tanh": // (exp(-x) - exp(x))/(exp(-x) + exp(x))
             r = cosh(2 * x.re) + cos(2 * x.im);
-            r = this.strBuild(sinh(2 * x.re) / r, sin(2 * x.im) / r);
+            r = strBuild(sinh(2 * x.re) / r, sin(2 * x.im) / r);
             break;
           case "ctgh":
           case "coth":
           case "cotanh": // (exp(-x) + exp(x))/(exp(-x) - exp(x))
             r = cosh(2 * x.tr) - cos(2 * x.im);
-            r = this.strBuild(sinh(2 * x.re) / r, -sin(2 * x.im) / r);
+            r = strBuild(sinh(2 * x.re) / r, -sin(2 * x.im) / r);
             break;
           case "sech": // 1/cosh(x)
             r = 0.5 * cosh(2 * x.re) + 0.5 * cos(2 * x.im);
-            r = this.strBuild(
+            r = strBuild(
               (cosh(x.re) * cos(x.im)) / r,
               (-sinh(x.re) * sin(x.im)) / r
             );
@@ -1975,7 +2011,7 @@ Do as you will.`);
           case "csch":
           case "cosech": // 1/sinh(x)
             r = 0.5 * cosh(2 * x.re) - 0.5 * cos(2 * x.im);
-            r = this.strBuild(
+            r = strBuild(
               (-sinh(x.re) * cos(x.im)) / r,
               (cosh(x.re) * sin(x.im)) / r
             );
@@ -2030,6 +2066,7 @@ Do as you will.`);
             r = this.internal_ln(x.re + r.re, x.im + r.im, true);
             break;
           default:
+            console.log(`The '${TRIG}' trig function isn't in the hyperbolic library`)
             return "NaN";
         }
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -2046,9 +2083,9 @@ Do as you will.`);
           return 0;
         }
         if (!converter._all.includes(FACTOR)) return ANGLE;
-        const p = this.strParse(ANGLE),
+        const p = strParse(ANGLE),
           factor = converter[FACTOR];
-        let r = this.strBuild(p.re * factor, p.im * factor);
+        let r = strBuild(p.re * factor, p.im * factor);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -2059,7 +2096,7 @@ Do as you will.`);
 
     decimalComplex({ COMPLEX, OPERATION, DECIMALS }) {
       try {
-        const p = this.strParse(COMPLEX);
+        const p = strParse(COMPLEX);
         OPERATION = OPERATION.toLowerCase();
         let fac = 10 ** (DECIMALS || 0),
           func;
@@ -2083,7 +2120,7 @@ Do as you will.`);
           default:
             return NaN;
         }
-        let r = this.strBuild(func(p.re * fac) / fac, func(p.im * fac) / fac);
+        let r = strBuild(func(p.re * fac) / fac, func(p.im * fac) / fac);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -2095,10 +2132,10 @@ Do as you will.`);
     equalsComplex({ COMPLEX1, COMPLEX2 }) {
       try {
         if (COMPLEX1 == COMPLEX2) return true;
-        const p1 = this.strParse(COMPLEX1),
-          p2 = this.strParse(COMPLEX2);
+        const p1 = strParse(COMPLEX1),
+          p2 = strParse(COMPLEX2);
         return (
-          abs(p1.re - p2.re) < this.small && abs(p1.im - p2.im) < this.small
+          abs(p1.re - p2.re) < pretty_small && abs(p1.im - p2.im) < pretty_small
         );
       } catch (e) {
         console.log(e);
@@ -2109,7 +2146,7 @@ Do as you will.`);
     isNaNComplex({ COMPLEX }) {
       try {
         if (COMPLEX != "NaN") {
-          const p = this.strParse(COMPLEX);
+          const p = strParse(COMPLEX);
           return isNaN(p.re) || isNaN(p.im);
         }
         return true;
@@ -2122,7 +2159,7 @@ Do as you will.`);
     isFiniteComplex({ COMPLEX }) {
       try {
         if (!COMPLEX.includes("Infinity")) {
-          const p = this.strParse(COMPLEX);
+          const p = strParse(COMPLEX);
           return isFinite(p.re) && isFinite(p.im);
         }
         return false;
@@ -2132,34 +2169,34 @@ Do as you will.`);
       }
     }
 
-    complexArray({ COMPLEX }) {
+    complexArray({ COMPLEX, FORM }) {
       try {
-        const p = this.strParse(COMPLEX);
-        return JSON.stringify([p.re, p.im]);
+        const p = strParse(COMPLEX);
+        switch (FORM) {
+          case "array":
+            return JSON.stringify([p.re, p.im]);
+          case "JSON":
+            return JSON.stringify(p);
+          case "compleX":
+            return p.re + "," + p.im;
+          default:
+            return "";
+        }
       } catch (e) {
         console.log(e);
-        return "[0, 0]";
-      }
-    }
-
-    complexJSON({ COMPLEX }) {
-      try {
-        return JSON.stringify(this.strParse(COMPLEX));
-      } catch (e) {
-        console.log(e);
-        return '{ "re": 0, "im": 0 }';
+        return "";
       }
     }
 
     mulVectorAroundPoint({ VECTOR, POINT, FACTOR }) {
       try {
-        VECTOR = this.strParse(VECTOR);
-        POINT = this.strParse(POINT);
-        let n = this.internal_mul(
+        VECTOR = strParse(VECTOR);
+        POINT = strParse(POINT);
+        let n = multiply(
           { re: VECTOR.re - POINT.re, im: VECTOR.im - POINT.im },
-          this.strParse(FACTOR)
+          strParse(FACTOR)
         );
-        let r = this.strBuild(n.re + POINT.re, n.im + POINT.im);
+        let r = strBuild(n.re + POINT.re, n.im + POINT.im);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -2170,14 +2207,14 @@ Do as you will.`);
 
     rotateVectorAroundPoint({ VECTOR, POINT, ANGLE }) {
       try {
-        VECTOR = this.strParse(VECTOR);
-        POINT = this.strParse(POINT);
-        ANGLE = this.strParse(ANGLE);
-        let n = this.internal_mul(
+        VECTOR = strParse(VECTOR);
+        POINT = strParse(POINT);
+        ANGLE = strParse(ANGLE);
+        let n = multiply(
           { re: VECTOR.re - POINT.re, im: VECTOR.im - POINT.im },
           this.internal_polar(exp(-ANGLE.im), ANGLE.re)
         );
-        let r = this.strBuild(n.re + POINT.re, n.im + POINT.im);
+        let r = strBuild(n.re + POINT.re, n.im + POINT.im);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -2196,70 +2233,71 @@ Do as you will.`);
       return "-0.5 + 0.8660254037844386i";
     }
     smallEnough() {
-      return this.small;
+      return pretty_small;
+    }
+    smallChange({ Sw }) {
+      pretty_small = Number(Sw);
     }
     goldenComplex() {
       return "1.618033988749895";
     }
 
     gammaAprox({ COMPLEX }) {
-      const x = this.strParse(COMPLEX);
+      const x = strParse(COMPLEX);
       let Z1 = this.internal_inv(x.re, x.im), // 1/x
-        Z2 = this.internal_sqrt(Z1.re * 2 * PI, Z1.im * 2 * PI), // sqrt(2*pi/z)
+        Z2 = this.internal_sqrt(Z1.re * 2 * PI, Z1.im * 2 * PI), // sqrt(2*pi/x)
         Z3 = this.internal_inv(
           x.re * 12 - Z1.re * 0.1,
           x.im * 12 - Z1.im * 0.1
         ); // 12x - 1/(10x)
-      Z3 = { re: (x.re + Z3.re) / euler, im: (x.im + Z3.im) / euler }; // ( z + 1/(12x - 1/(10x)) )/e
-      Z3 = this.internal_mul(
+      Z3 = { re: (x.re + Z3.re) / euler, im: (x.im + Z3.im) / euler }; // ( x + 1/(12x - 1/(10x)) )/e
+      Z3 = multiply(
         this.internal_twod_to_real(Z3, x.re),
         this.internal_twod_to_imag(Z3, x.im)
-      ); // {...}^z
-      return this.internal_mul(Z2, Z3, true); // gamma
+      ); // {...}^x
+      return multiply(Z2, Z3, true); // gamma
     }
 
-    /**
     fibonacciComplex({ COMPLEX }) {
-      let r = Complex.GOLDEN.pow(COMPLEX)
-        .sub(Complex.SILVER.pow(COMPLEX))
-        .div(2.23606797749979)
-        .toString();
-      if (this.noSpacing) r = r.replace(/\s+/g, '');
-      return r;
+      const x = strParse(COMPLEX),
+        re = x.re,
+        im = x.im,
+        r1 = fp**re, 
+        r2 = exp(x.re * en - im * PI),
+        theta2 = im * en + re * PI;
+      return strBuild(
+        (r1 * cos(ep*im) - r2 * cos(theta2)) / sr5, 
+        (r1 * sin(ep*im) - r2 * sin(theta2)) / sr5
+      )
     }
 
-        The following is the v3 of the Factorial function. 
-        The day it's fast, efficient and right, it'll see the light of day.
-
-
-    facOf({ COMPLEX }) {
-      try {
-        let r = factorial(Complex(COMPLEX), this.terms).toString();
-        if (this.noSpacing) r = r.replace(/\s+/g, '');
-        return r;
-      } catch (e) {
-        console.log(e);
-        return NaN;
+    lambertAprox({ COMPLEX }) {
+      const z = strParse(COMPLEX);
+      if (!(z.re || z.im)) return 0;
+      const ln_z = { 
+          re: lnHypot(z.re, z.im),
+          im: atg(z.re, z.im) 
+        },
+      gw = (w) => ({ 
+          re: w.re + lnHypot(w.re, w.im) - ln_z.re,
+          im: w.im + atg(w.re, w.im) - ln_z.im
+        });
+      let w = ln_z // w =? ln(z)
+      /* $w_{+1} = w − \frac{2w(w+1)g}{​2(w+1)^2+g}$ */
+      for (let i = 0; i < 3; i++) { // enough precision?
+        const g = gw(w);
+        let temp = multiply(g.re, g.im, 2*w.re*(w.re+1) - 2*w.im**2, 2*w.im*(2*w.re+1)); // g * (2w(w+1))
+        temp = this.internal_div(temp, { 're': 2*(w.re+1)**2 - 2*w.im**2 + g.re, 'im': 4*(w.re+1)*w.im + g.im}); // .../(2(w+1)^2+g)
+        w = { 're': w.re - temp.re, 'im': w.im - temp.im };
       }
+      return strBuild(w.re, w.im);
     }
-    Tfac() {
-      try {
-        return this.terms;
-      } catch (e) {
-        console.log(e);
-        return NaN;
-      }
+    
+    _test_i_wanna_die_but_cant(args, util, block) {
+      const x = strParse(this.lambertAprox(args, util, block));
+      return multiply(x.re, x.im, exp(x.re) * cos(x.im), exp(x.re) * sin(x.im), true);
     }
-    setTfac({ COMPLEX }) {
-      let ZED = Scratch.Cast.toNumber(COMPLEX);
-      if (ZED < 0) return;
-      if (Number.isInteger(ZED)) {
-        this.terms = ZED;
-      } else {
-        this.terms = Math.trunc(ZED);
-      }
-    }
-    */
+    
   }
 
   /*Gradient Patch by 0znzw & SharkPool [thanks]*/
@@ -2292,7 +2330,7 @@ Do as you will.`);
         return res;
       };
       SB.SPgradients.patched = true;
-      //}
+      //} /* and done, I guess... */
       SB.SPgradients.gradientUrls["kenayComplexity"] = [
         "url(#kenayComplexity-GRAD)",
       ]; //ext id, gradient id
