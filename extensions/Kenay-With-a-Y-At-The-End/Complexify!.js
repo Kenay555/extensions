@@ -113,9 +113,9 @@
     throw SyntaxError(anything);
   }
   const sr5 = sqrt(5), // For the fibonacci calculator
-    fp = 0.5 + 0.5*sr5, 
-    fn = 0.5 - 0.5*sr5, 
-    ep = ln(fp), 
+    fp = 0.5 + 0.5 * sr5,
+    fn = 0.5 - 0.5 * sr5,
+    ep = ln(fp),
     en = ln(-fn); // yeah, phi.
   const hypot = function (x, y) {
     x = abs(x);
@@ -181,99 +181,99 @@
     hacker: 0,
   };
   const strParse = function strParse(str) {
-      if ("string" != typeof str) return { re: str, im: 0 };
-      str = str.toLowerCase().replace(/_/g, "");
-      if (str.includes("infinity")) return { re: Infinity, im: Infinity };
-      if (str == "nan") return { re: NaN, im: NaN };
-      const tokens = str.match(/i|\d+\.?\d*e[+-]?\d+|[+-]|\d+\.?\d*|\.\d+|./g); // Magic
-      if (str == null) explode("I'm pretty sure we can't use that: " + str);
+    if ("string" != typeof str) return { re: str, im: 0 };
+    str = str.toLowerCase().replace(/_/g, "");
+    if (str.includes("infinity")) return { re: Infinity, im: Infinity };
+    if (str == "nan") return { re: NaN, im: NaN };
+    const tokens = str.match(/i|\d+\.?\d*e[+-]?\d+|[+-]|\d+\.?\d*|\.\d+|./g); // Magic
+    if (str == null) explode("I'm pretty sure we can't use that: " + str);
 
-      let parsed = { re: 0, im: 0 },
-        pos = 1, //+
-        neg = 0, //-
-        white = [" ", "\t", "\n"];
+    let parsed = { re: 0, im: 0 },
+      pos = 1, //+
+      neg = 0, //-
+      white = [" ", "\t", "\n"];
 
-      // don't swap to 'of', it'll ruin the trick
-      for (let index = 0; index < tokens.length; index++) {
-        let chara = tokens[index];
-        if (white.includes(chara)) continue;
-        if (chara == "+") pos++;
-        else if (chara == "-") neg++;
-        else {
-          if (pos + neg == 0)
-            explode(`Why is '${chara}' without any sign?: "${str}"`);
-          if (chara == "i") {
-            if (" " == tokens[index + 1] || isNaN(tokens[index + 1])) {
-              // if the i is lonely, it means 1
-              parsed.im += parseFloat((neg % 2 ? "-" : "") + 1);
-            } else {
-              parsed.im += parseFloat(
-                (neg % 2 ? "-" : "") + tokens[index + 1].replace(",", ".")
-              );
-              index++; // the trick
-            }
+    // don't swap to 'of', it'll ruin the trick
+    for (let index = 0; index < tokens.length; index++) {
+      let chara = tokens[index];
+      if (white.includes(chara)) continue;
+      if (chara == "+") pos++;
+      else if (chara == "-") neg++;
+      else {
+        if (pos + neg == 0)
+          explode(`Why is '${chara}' without any sign?: "${str}"`);
+        if (chara == "i") {
+          if (" " == tokens[index + 1] || isNaN(tokens[index + 1])) {
+            // if the i is lonely, it means 1
+            parsed.im += parseFloat((neg % 2 ? "-" : "") + 1);
           } else {
-            if (isNaN(chara)) explode(`'${chara}' is NOT a number: "${str}"`);
-            chara = chara.replace(",", ".");
-            if ("i" == tokens[index + 1]) {
-              parsed.im += parseFloat((neg % 2 ? "-" : "") + chara);
-              index++;
-            } else {
-              parsed.re += parseFloat((neg % 2 ? "-" : "") + chara);
-            }
+            parsed.im += parseFloat(
+              (neg % 2 ? "-" : "") + tokens[index + 1].replace(",", ".")
+            );
+            index++; // the trick
           }
-          pos = neg = 0;
+        } else {
+          if (isNaN(chara)) explode(`'${chara}' is NOT a number: "${str}"`);
+          chara = chara.replace(",", ".");
+          if ("i" == tokens[index + 1]) {
+            parsed.im += parseFloat((neg % 2 ? "-" : "") + chara);
+            index++;
+          } else {
+            parsed.re += parseFloat((neg % 2 ? "-" : "") + chara);
+          }
         }
+        pos = neg = 0;
       }
-      if (pos + neg > 0)
-        explode(
-          `There's a lonely '${neg % 2 ? "-" : "+"}' ending sign: "${str}"`
-        );
-      return parsed;
+    }
+    if (pos + neg > 0)
+      explode(
+        `There's a lonely '${neg % 2 ? "-" : "+"}' ending sign: "${str}"`
+      );
+    return parsed;
   };
   var pretty_small = 1e-15;
   const strBuild = function strBuild(a, b) {
-      if ("object" === typeof a) {
-        b = a.im;
-        a = a.re;
-      }
-      if (isNaN(a) || isNaN(b)) {
-        return "NaN";
-      }
-      if (!(isFinite(a) && isFinite(b))) {
-        return "Infinity";
-      }
-      if (abs(a) < pretty_small) {
-        a = 0;
-      }
-      if (abs(b) < pretty_small) {
-        b = 0;
-      }
-      let ret = "";
-      if (b === 0) {
-        return ret + a;
-      }
-      if (a !== 0) {
-        ret += a;
-        ret += " ";
-        if (b < 0) {
-          b = -b;
-          ret += "-";
-        } else {
-          ret += "+";
-        }
-        ret += " ";
-      } else if (b < 0) {
+    if ("object" === typeof a) {
+      b = a.im;
+      a = a.re;
+    }
+    if (isNaN(a) || isNaN(b)) {
+      return "NaN";
+    }
+    if (!(isFinite(a) && isFinite(b))) {
+      return "Infinity";
+    }
+    if (abs(a) < pretty_small) {
+      a = 0;
+    }
+    if (abs(b) < pretty_small) {
+      b = 0;
+    }
+    let ret = "";
+    if (b === 0) {
+      return ret + a;
+    }
+    if (a !== 0) {
+      ret += a;
+      ret += " ";
+      if (b < 0) {
         b = -b;
         ret += "-";
+      } else {
+        ret += "+";
       }
-      if (1 !== b) {
-        ret += b;
-      }
-      return ret + "i";
+      ret += " ";
+    } else if (b < 0) {
+      b = -b;
+      ret += "-";
+    }
+    if (1 !== b) {
+      ret += b;
+    }
+    return ret + "i";
   };
   const multiply = function multiply(a, b, c, d, str) {
-    if (d == undefined) { 
+    if (d == undefined) {
       str = c;
       c = a.re;
       d = a.im;
@@ -281,7 +281,7 @@
       b = b.im;
     }
     let nre = a * c - b * d,
-        nim = a * d + b * c;
+      nim = a * d + b * c;
     return str ? strBuild(nre, nim) : { re: nre, im: nim };
   };
 
@@ -375,7 +375,7 @@ Do as you will.`);
         re: sqrt((radius + nre) / 2),
         im: sqrt((radius - nre) / 2) * sign(nim),
       };
-    } 
+    }
 
     internal_polar(re, im, str) {
       if ("object" == typeof re) {
@@ -514,7 +514,7 @@ Do as you will.`);
         a -= kre;
         b -= kim;
       }
-      return str ? strBuild(a, b) : { re: a, im: b}; // NOTE: Very expensive calcs, use sparingly
+      return str ? strBuild(a, b) : { re: a, im: b }; // NOTE: Very expensive calcs, use sparingly
     }
 
     internal_cbrt(re, im, str) {
@@ -529,7 +529,7 @@ Do as you will.`);
       let ret = { re: nre * radius, im: nim * radius };
       return str ? strBuild(ret) : ret;
     }
-    
+
     getInfo() {
       return {
         id: "kenayComplexity",
@@ -1196,7 +1196,7 @@ Do as you will.`);
               },
               FORM: {
                 type: Scratch.ArgumentType.STRING,
-                menu: "exporting"
+                menu: "exporting",
               },
             },
             hideFromPalette: this.advanced,
@@ -1468,11 +1468,7 @@ Do as you will.`);
 
     multiplyComplex({ COMPLEX1, COMPLEX2 }) {
       try {
-        let r = multiply(
-          strParse(COMPLEX1),
-          strParse(COMPLEX2),
-          true
-        );
+        let r = multiply(strParse(COMPLEX1), strParse(COMPLEX2), true);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1483,11 +1479,7 @@ Do as you will.`);
 
     divideComplex({ COMPLEX1, COMPLEX2 }) {
       try {
-        let r = this.internal_div(
-          strParse(COMPLEX1),
-          strParse(COMPLEX2),
-          true
-        );
+        let r = this.internal_div(strParse(COMPLEX1), strParse(COMPLEX2), true);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1569,7 +1561,7 @@ Do as you will.`);
       try {
         const p = strParse(COMPLEX),
           fac = Number(FACTOR);
-        let r = strBuild(p.re*fac, p.im*fac);
+        let r = strBuild(p.re * fac, p.im * fac);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
       } catch (e) {
@@ -1741,11 +1733,7 @@ Do as you will.`);
       if (util.target.isStage) return;
       const p1 = strParse(args.COMPLEX1),
         p2 = strParse(args.COMPLEX2),
-        p = multiply(
-          p1,
-          this.internal_polar(exp(-p2.im), p2.re, false),
-          false
-        );
+        p = multiply(p1, this.internal_polar(exp(-p2.im), p2.re, false), false);
       util.target.setXY(p.re, p.im);
     }
 
@@ -1862,7 +1850,9 @@ Do as you will.`);
     }
 
     atg2Complex({ COMPLEX1, COMPLEX2 }) {
-      let r = strBuild(this.internal_arc(strParse(COMPLEX1), strParse(COMPLEX2)))
+      let r = strBuild(
+        this.internal_arc(strParse(COMPLEX1), strParse(COMPLEX2))
+      );
       if (this.noSpacing) r = r.replace(/\s+/g, "");
       return r;
     }
@@ -1966,7 +1956,9 @@ Do as you will.`);
             );
             break;
           default:
-            console.log(`The '${TRIG}' trig function isn't in the circular library`)
+            console.log(
+              `The '${TRIG}' trig function isn't in the circular library`
+            );
             return "NaN";
         }
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -2066,7 +2058,9 @@ Do as you will.`);
             r = this.internal_ln(x.re + r.re, x.im + r.im, true);
             break;
           default:
-            console.log(`The '${TRIG}' trig function isn't in the hyperbolic library`)
+            console.log(
+              `The '${TRIG}' trig function isn't in the hyperbolic library`
+            );
             return "NaN";
         }
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -2262,42 +2256,56 @@ Do as you will.`);
       const x = strParse(COMPLEX),
         re = x.re,
         im = x.im,
-        r1 = fp**re, 
+        r1 = fp ** re,
         r2 = exp(x.re * en - im * PI),
         theta2 = im * en + re * PI;
       return strBuild(
-        (r1 * cos(ep*im) - r2 * cos(theta2)) / sr5, 
-        (r1 * sin(ep*im) - r2 * sin(theta2)) / sr5
-      )
+        (r1 * cos(ep * im) - r2 * cos(theta2)) / sr5,
+        (r1 * sin(ep * im) - r2 * sin(theta2)) / sr5
+      );
     }
 
     lambertAprox({ COMPLEX }) {
       const z = strParse(COMPLEX);
       if (!(z.re || z.im)) return 0;
-      const ln_z = { 
+      const ln_z = {
           re: lnHypot(z.re, z.im),
-          im: atg(z.re, z.im) 
+          im: atg(z.re, z.im),
         },
-      gw = (w) => ({ 
+        gw = (w) => ({
           re: w.re + lnHypot(w.re, w.im) - ln_z.re,
-          im: w.im + atg(w.re, w.im) - ln_z.im
+          im: w.im + atg(w.re, w.im) - ln_z.im,
         });
-      let w = ln_z // w =? ln(z)
+      let w = ln_z; // w =? ln(z)
       /* $w_{+1} = w − \frac{2w(w+1)g}{​2(w+1)^2+g}$ */
-      for (let i = 0; i < 3; i++) { // enough precision?
+      for (let i = 0; i < 3; i++) {
+        // enough precision?
         const g = gw(w);
-        let temp = multiply(g.re, g.im, 2*w.re*(w.re+1) - 2*w.im**2, 2*w.im*(2*w.re+1)); // g * (2w(w+1))
-        temp = this.internal_div(temp, { 're': 2*(w.re+1)**2 - 2*w.im**2 + g.re, 'im': 4*(w.re+1)*w.im + g.im}); // .../(2(w+1)^2+g)
-        w = { 're': w.re - temp.re, 'im': w.im - temp.im };
+        let temp = multiply(
+          g.re,
+          g.im,
+          2 * w.re * (w.re + 1) - 2 * w.im ** 2,
+          2 * w.im * (2 * w.re + 1)
+        ); // g * (2w(w+1))
+        temp = this.internal_div(temp, {
+          re: 2 * (w.re + 1) ** 2 - 2 * w.im ** 2 + g.re,
+          im: 4 * (w.re + 1) * w.im + g.im,
+        }); // .../(2(w+1)^2+g)
+        w = { re: w.re - temp.re, im: w.im - temp.im };
       }
       return strBuild(w.re, w.im);
     }
-    
+
     _test_i_wanna_die_but_cant(args, util, block) {
       const x = strParse(this.lambertAprox(args, util, block));
-      return multiply(x.re, x.im, exp(x.re) * cos(x.im), exp(x.re) * sin(x.im), true);
+      return multiply(
+        x.re,
+        x.im,
+        exp(x.re) * cos(x.im),
+        exp(x.re) * sin(x.im),
+        true
+      );
     }
-    
   }
 
   /*Gradient Patch by 0znzw & SharkPool [thanks]*/
