@@ -128,7 +128,7 @@
   };
   function lnHypot(x, y) {
     if (x < y) [x, y] = [y, x];
-    (x = abs(x)), (y = abs(y));
+    ((x = abs(x)), (y = abs(y)));
     if (x === 0) {
       // shortcut
       return -Infinity;
@@ -208,7 +208,7 @@
             parsed.im += parseFloat((neg % 2 ? "-" : "") + 1);
           } else {
             parsed.im += parseFloat(
-              (neg % 2 ? "-" : "") + tokens[index + 1].replace(",", ".")
+              (neg % 2 ? "-" : "") + tokens[index + 1].replace(",", "."),
             );
             index++; // the trick
           }
@@ -227,7 +227,7 @@
     }
     if (pos + neg > 0)
       explode(
-        `There's a lonely '${neg % 2 ? "-" : "+"}' ending sign: "${str}"`
+        `There's a lonely '${neg % 2 ? "-" : "+"}' ending sign: "${str}"`,
       );
     return parsed;
   };
@@ -314,7 +314,7 @@
       }
       if (!this) {
         console.error(
-          "`this` isn't bounded enough for the complex constructor"
+          "`this` isn't bounded enough for the complex constructor",
         );
       } else {
         console.log(this);
@@ -413,7 +413,7 @@ Do as you will.`);
       const num = this.internal_ln(
           cos.re + sin.im,
           cos.im - sin.re,
-          false // objects
+          false, // objects
         ),
         den = this.internal_ln(hyp.re, hyp.im, false),
         iln = { re: den.im - num.im, im: num.re - den.re };
@@ -437,7 +437,7 @@ Do as you will.`);
         return this.internal_twod_to_real(
           { re: base.re / mag, im: -base.im / mag },
           -n,
-          str
+          str,
         );
       }
       // I'll use binary decomposition lol
@@ -477,7 +477,7 @@ Do as you will.`);
       }
       return this.internal_polar(
         exp(-n * atg(base.re, base.im)),
-        (lnHypot(base.re, base.im) * n) % (2 * PI)
+        (lnHypot(base.re, base.im) * n) % (2 * PI),
       );
     }
 
@@ -1168,7 +1168,7 @@ Do as you will.`);
             opcode: "decimalComplex",
             blockType: Scratch.BlockType.REPORTER,
             text: Scratch.translate(
-              "[OPERATION] [COMPLEX] to [DECIMALS] decimals"
+              "[OPERATION] [COMPLEX] to [DECIMALS] decimals",
             ),
             arguments: {
               COMPLEX: {
@@ -1234,7 +1234,7 @@ Do as you will.`);
             opcode: "rotateVectorAroundPoint",
             blockType: Scratch.BlockType.REPORTER,
             text: Scratch.translate(
-              "rotate [VECTOR] around [POINT] by angle [ANGLE]"
+              "rotate [VECTOR] around [POINT] by angle [ANGLE]",
             ),
             arguments: {
               VECTOR: {
@@ -1494,7 +1494,7 @@ Do as you will.`);
         const p1 = strParse(COMPLEX1),
           p2 = strParse(COMPLEX2);
         let calc = this.internal_div(p1, p2);
-        (calc.re = floor(calc.re)), (calc.im = floor(calc.im));
+        ((calc.re = floor(calc.re)), (calc.im = floor(calc.im)));
         calc = multiply(p1, calc);
         let r = strBuild(p1.re - calc.re, p1.im - calc.im);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -1511,7 +1511,7 @@ Do as you will.`);
           p2 = strParse(COMPLEX2);
         let r = multiply(
           this.internal_twod_to_real(p1, p2.re),
-          this.internal_twod_to_imag(p1, p2.im)
+          this.internal_twod_to_imag(p1, p2.im),
         );
         r = strBuild(r);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -1577,7 +1577,7 @@ Do as you will.`);
         const p2 = strParse(ANGLE);
         let r = multiply(
           strParse(RADIUS),
-          this.internal_polar(exp(-p2.im), p2.re)
+          this.internal_polar(exp(-p2.im), p2.re),
         );
         r = strBuild(r);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -1743,7 +1743,7 @@ Do as you will.`);
       let target = util.target;
       target.setXY(
         p1.re * target.x - p1.im * target.y,
-        p1.re * target.y + p1.im * target.x
+        p1.re * target.y + p1.im * target.x,
       );
     }
 
@@ -1765,14 +1765,14 @@ Do as you will.`);
             finish = sf[$sub1_or_finish];
           util.target.setXY(
             start.re + (finish.re - start.re) * frac,
-            start.im + (finish.im - start.im) * frac
+            start.im + (finish.im - start.im) * frac,
           );
           util.yield();
         } else {
           // We're done! Now, lets end this
           util.target.setXY(
             util.stackFrame[$sub1_or_finish].re,
-            util.stackFrame[$sub1_or_finish].im
+            util.stackFrame[$sub1_or_finish].im,
           );
         }
       } else {
@@ -1831,7 +1831,7 @@ Do as you will.`);
           im = x.im;
         let r = strBuild(
           0.5 * atg(1 - re ** 2 - im ** 2, 2 * re),
-          0.5 * lnHypot(re, im + 1) - 0.5 * lnHypot(re, im - 1)
+          0.5 * lnHypot(re, im + 1) - 0.5 * lnHypot(re, im - 1),
         ); // indeed, magic
         if (this.noSpacing) r = r.replace(/\s+/g, "");
         return r;
@@ -1851,7 +1851,7 @@ Do as you will.`);
 
     atg2Complex({ COMPLEX1, COMPLEX2 }) {
       let r = strBuild(
-        this.internal_arc(strParse(COMPLEX1), strParse(COMPLEX2))
+        this.internal_arc(strParse(COMPLEX1), strParse(COMPLEX2)),
       );
       if (this.noSpacing) r = r.replace(/\s+/g, "");
       return r;
@@ -1892,7 +1892,7 @@ Do as you will.`);
             r = 0.5 * cosh(2 * x.im) + 0.5 * cos(2 * x.re);
             r = strBuild(
               (cosh(x.im) * cos(x.re)) / r,
-              (sinh(x.im) * sin(x.re)) / r
+              (sinh(x.im) * sin(x.re)) / r,
             );
             break;
           case "csc":
@@ -1900,7 +1900,7 @@ Do as you will.`);
             r = 0.5 * cosh(2 * x.im) - 0.5 * cos(2 * x.re);
             r = strBuild(
               (cosh(x.im) * sin(x.re)) / r,
-              (-sinh(x.im) * cos(x.re)) / r
+              (-sinh(x.im) * cos(x.re)) / r,
             );
             break;
           case "arcsin":
@@ -1919,7 +1919,7 @@ Do as you will.`);
               one,
               x,
               this.internal_babyl(x, $add1_or_start),
-              true
+              true,
             ); // (1-xi)/sqrt(x^2 +1)
             break;
           case "arccot":
@@ -1931,7 +1931,7 @@ Do as you will.`);
               x,
               one,
               this.internal_babyl(x, $add1_or_start),
-              true
+              true,
             );
             break;
           case "arcsec":
@@ -1941,7 +1941,7 @@ Do as you will.`);
               one,
               this.internal_babyl(x, $sub1_or_finish),
               x,
-              true
+              true,
             ); // (1 -isqrt(x^2 -1))/x
             break;
           case "arccsc":
@@ -1952,12 +1952,12 @@ Do as you will.`);
               this.internal_babyl(x, $sub1_or_finish),
               one,
               x,
-              true
+              true,
             );
             break;
           default:
             console.log(
-              `The '${TRIG}' trig function isn't in the circular library`
+              `The '${TRIG}' trig function isn't in the circular library`,
             );
             return "NaN";
         }
@@ -1997,7 +1997,7 @@ Do as you will.`);
             r = 0.5 * cosh(2 * x.re) + 0.5 * cos(2 * x.im);
             r = strBuild(
               (cosh(x.re) * cos(x.im)) / r,
-              (-sinh(x.re) * sin(x.im)) / r
+              (-sinh(x.re) * sin(x.im)) / r,
             );
             break;
           case "csch":
@@ -2005,7 +2005,7 @@ Do as you will.`);
             r = 0.5 * cosh(2 * x.re) - 0.5 * cos(2 * x.im);
             r = strBuild(
               (-sinh(x.re) * cos(x.im)) / r,
-              (cosh(x.re) * sin(x.im)) / r
+              (cosh(x.re) * sin(x.im)) / r,
             );
             break;
           case "arsinh":
@@ -2025,10 +2025,10 @@ Do as you will.`);
               this.internal.sqrt(
                 this.internal_div(
                   { re: x.re + 1, im: x.im },
-                  { re: 1 - x.re, im: -x.im }
-                )
+                  { re: 1 - x.re, im: -x.im },
+                ),
               ),
-              true
+              true,
             );
             break;
           case "arcoth":
@@ -2038,10 +2038,10 @@ Do as you will.`);
               this.internal.sqrt(
                 this.internal_div(
                   { re: x.re + 1, im: x.im },
-                  { re: x.re - 1, im: x.im }
-                )
+                  { re: x.re - 1, im: x.im },
+                ),
               ),
-              true
+              true,
             );
             break;
           case "arsech":
@@ -2059,7 +2059,7 @@ Do as you will.`);
             break;
           default:
             console.log(
-              `The '${TRIG}' trig function isn't in the hyperbolic library`
+              `The '${TRIG}' trig function isn't in the hyperbolic library`,
             );
             return "NaN";
         }
@@ -2188,7 +2188,7 @@ Do as you will.`);
         POINT = strParse(POINT);
         let n = multiply(
           { re: VECTOR.re - POINT.re, im: VECTOR.im - POINT.im },
-          strParse(FACTOR)
+          strParse(FACTOR),
         );
         let r = strBuild(n.re + POINT.re, n.im + POINT.im);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -2206,7 +2206,7 @@ Do as you will.`);
         ANGLE = strParse(ANGLE);
         let n = multiply(
           { re: VECTOR.re - POINT.re, im: VECTOR.im - POINT.im },
-          this.internal_polar(exp(-ANGLE.im), ANGLE.re)
+          this.internal_polar(exp(-ANGLE.im), ANGLE.re),
         );
         let r = strBuild(n.re + POINT.re, n.im + POINT.im);
         if (this.noSpacing) r = r.replace(/\s+/g, "");
@@ -2242,12 +2242,12 @@ Do as you will.`);
         Z2 = this.internal_sqrt(Z1.re * 2 * PI, Z1.im * 2 * PI), // sqrt(2*pi/x)
         Z3 = this.internal_inv(
           x.re * 12 - Z1.re * 0.1,
-          x.im * 12 - Z1.im * 0.1
+          x.im * 12 - Z1.im * 0.1,
         ); // 12x - 1/(10x)
       Z3 = { re: (x.re + Z3.re) / euler, im: (x.im + Z3.im) / euler }; // ( x + 1/(12x - 1/(10x)) )/e
       Z3 = multiply(
         this.internal_twod_to_real(Z3, x.re),
-        this.internal_twod_to_imag(Z3, x.im)
+        this.internal_twod_to_imag(Z3, x.im),
       ); // {...}^x
       return multiply(Z2, Z3, true); // gamma
     }
@@ -2261,7 +2261,7 @@ Do as you will.`);
         theta2 = im * en + re * PI;
       return strBuild(
         (r1 * cos(ep * im) - r2 * cos(theta2)) / sr5,
-        (r1 * sin(ep * im) - r2 * sin(theta2)) / sr5
+        (r1 * sin(ep * im) - r2 * sin(theta2)) / sr5,
       );
     }
 
@@ -2285,7 +2285,7 @@ Do as you will.`);
           g.re,
           g.im,
           2 * w.re * (w.re + 1) - 2 * w.im ** 2,
-          2 * w.im * (2 * w.re + 1)
+          2 * w.im * (2 * w.re + 1),
         ); // g * (2w(w+1))
         temp = this.internal_div(temp, {
           re: 2 * (w.re + 1) ** 2 - 2 * w.im ** 2 + g.re,
@@ -2303,7 +2303,7 @@ Do as you will.`);
         x.im,
         exp(x.re) * cos(x.im),
         exp(x.re) * sin(x.im),
-        true
+        true,
       );
     }
   }
